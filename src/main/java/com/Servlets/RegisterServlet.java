@@ -1,5 +1,6 @@
 package com.Servlets;
 
+import com.utils.DBConnection;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,9 +18,6 @@ import jakarta.servlet.http.HttpSession;
 public class RegisterServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/DemoContacts";
-    private static final String DB_USER = "root";
-    private static final String DB_PASS = null;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -44,8 +42,7 @@ public class RegisterServlet extends HttpServlet {
 
         try {
             // Establish the connection
-            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
-
+            connection = DBConnection.getConnection();
             // Check if the email already exists
             String checkEmailSQL = "SELECT email FROM MailMapper WHERE email = ?";
             ps = connection.prepareStatement(checkEmailSQL);
@@ -53,7 +50,7 @@ public class RegisterServlet extends HttpServlet {
             rs = ps.executeQuery();
 
             if (rs.next()) {
-                registrationSuccessful = false; // Email already exists
+                registrationSuccessful = false; 
             } else {
                 // Insert new user
                 String insertSQL = "INSERT INTO userdata (password, first_name, last_name, age, address, phone) VALUES (?, ?, ?, ?, ?, ?)";
