@@ -1,0 +1,139 @@
+* {
+    box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: "Lato", sans-serif;
+}
+
+.sidebar {
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  background-color: #f1f1f1;
+  position: fixed;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sidebar a {
+  display: block;
+  color: black;
+  padding: 16px;
+  text-decoration: none;
+}
+ 
+.sidebar a.active {
+  background-color: #04AA6D;
+  color: white;
+}
+
+.sidebar a:hover:not(.active) {
+  background-color: #555;
+  color: white;
+}
+.logout{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+ }
+
+div.content {
+  margin-left: 200px;
+  padding: 1px 16px;
+  height: 1000px;
+}
+
+
+@media screen and (max-width: 700px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+  .sidebar a {float: left;}
+  div.content {margin-left: 0;}
+}
+
+@media screen and (max-width: 400px) {
+  .sidebar a {
+    text-align: center;
+    float: none;
+  }
+}
+
+    
+	    table {
+	    	width: 100%;
+	    	border-collapse: collapse;
+		}
+	
+		table, th, td {
+	    	border: 1px solid #ddd;
+		}
+	
+		th, td {
+	    	padding: 8px;
+	    	text-align: left;
+		}
+	
+		th {
+	    	background-color: #f2f2f2;
+		}
+		.addcontact {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	width: 50vw;
+    
+}
+
+.container{
+	display: flex;
+    align-content: center;
+    justify-content: center;
+}
+
+.form-group {
+    padding-right: 23px;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.addcontact input[type="text"],
+.addcontact input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.addcontact input[type="radio"] {
+    margin: 0 5px;
+}
+
+.mybutton {
+    background-color: #04AA6D;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    margin-bottom: 1vw;
+    display: inline-block;
+}
+
+.heading{
+	    text-align: center;
+    font-size: 3vw;
+    font-weight: 800;
+        margin-bottom: 0px;
+}

@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class DbTest extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/DemoContacts"; // Replace with your database URL
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/DemoContacts"; 
     private static final String DB_USER = "root"; // Replace with your database username
     private static final String DB_PASS = null; // Replace with your database password
 

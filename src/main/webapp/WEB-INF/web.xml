@@ -9,44 +9,4 @@
     <welcome-file>default.jsp</welcome-file>
     <welcome-file>default.htm</welcome-file>
   </welcome-file-list>
-  <servlet>
-    <description></description>
-    <display-name>LoginServlet</display-name>
-    <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>com.Servlets.LoginServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>LoginServlet</servlet-name>
-    <url-pattern>/LoginServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>RegisterServlet</display-name>
-    <servlet-name>RegisterServlet</servlet-name>
-    <servlet-class>com.Servlets.RegisterServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>RegisterServlet</servlet-name>
-    <url-pattern>/RegisterServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>DbTest</display-name>
-    <servlet-name>DbTest</servlet-name>
-    <servlet-class>com.Servlets.DbTest</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>DbTest</servlet-name>
-    <url-pattern>/DbTest</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>DemoTest</display-name>
-    <servlet-name>DemoTest</servlet-name>
-    <servlet-class>com.Servlets.DemoTest</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>DemoTest</servlet-name>
-    <url-pattern>/DemoTest</url-pattern>
-  </servlet-mapping>
 </web-app>
