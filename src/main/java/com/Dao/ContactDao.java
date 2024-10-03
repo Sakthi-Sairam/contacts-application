@@ -62,4 +62,25 @@ public class ContactDao {
 		}
         return rc>0;
 	}
+	
+	public static boolean updateContact(Contact contact) throws SQLException {
+		String sql = "update MyContactsData "
+				+ "set friend_email=?, alias_fnd_name=?, phone=?, address=?, isArchived=?, isFavorite=? "
+				+ "where MyContactsID=?";
+		int rc=0;
+		try(Connection connection = DBConnection.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)){
+			ps.setString(1, contact.getFriend_email());
+			ps.setString(2, contact.getAlias_name());
+			ps.setString(3, contact.getPhone());
+			ps.setString(4, contact.getAddress());
+			ps.setInt(5, contact.getIsArchived());
+			ps.setInt(6, contact.getIsFavorite());
+			ps.setInt(7, contact.getMyContactsID());
+
+			rc = ps.executeUpdate();
+			
+		}
+        return rc>0;
+	}
 }

@@ -7,6 +7,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class userDao {
 	
 	public static boolean mailCheck(String email) {
@@ -67,34 +69,71 @@ public class userDao {
     	
     }
     
-	public static User loginUser(String email, String password) {
-	    ResultSet rs = null;
-	    String sql = "SELECT a.user_id, a.first_name, a.last_name, a.age, a.address, a.phone FROM userdata a JOIN MailMapper b ON a.user_id = b.user_id WHERE b.email = ? AND a.password = ?";
-	    User user = null;
+    public static boolean updatePassword(int user_id, String password) throws SQLException {
+		String sql = "update userdata set password=? where user_id=?";
+		int rc = 0;
+		try(Connection connection = DBConnection.getConnection();
+				PreparedStatement ps = connection.prepareStatement(sql)){
+			ps.setString(1, password);
+			ps.setInt(2, user_id);
 
-	    try (Connection connection = DBConnection.getConnection(); 
-	         PreparedStatement ps = connection.prepareStatement(sql)) {
-	        
-	        ps.setString(1, email);
-	        ps.setString(2, password); 
+			
+			rc = ps.executeUpdate();
+		}
+		return rc>0;
+    	
+    }
+    
+    public static User loginUser(String email, String password) throws SQLException {
+        ResultSet rs = null;
+        String sql = "SELECT a.user_id, a.first_name, a.password, a.last_name, a.age, a.address, a.phone FROM userdata a JOIN MailMapper b ON a.user_id = b.user_id WHERE b.email = ?";
+        User user = null;
+        String storedHashedPassword = null;
+        int user_id=0;
+        
 
-	        rs = ps.executeQuery();
-	        if (rs.next()) {
-	            user = new User(
-	                rs.getInt("user_id"),
-	                rs.getString("first_name"),
-	                rs.getString("last_name"),
-	                rs.getInt("age"),
-	                rs.getString("address"),
-	                rs.getString("phone")
-	            );
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
+        try (Connection connection = DBConnection.getConnection(); 
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            
+            ps.setString(1, email);
+            rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                storedHashedPassword = rs.getString("password");
+                user_id = rs.getInt("user_id");
+                System.out.println("Stored Hashed Password: " + storedHashedPassword);
 
-	    return user;
-	}
+                boolean isCorrectPassword = BCrypt.checkpw(password, storedHashedPassword);
+                if (isCorrectPassword) {
+                    user = new User(
+                        rs.getInt("user_id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getInt("age"),
+                        rs.getString("address"),
+                        rs.getString("phone")
+                    );
+                } else {
+                    System.out.println("Password does not match."); // Debug log
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            System.out.println("Password validation failed: " + e.getMessage());
+            
+            if(password.equals(storedHashedPassword)) {
+            	System.out.println(user_id+" "+storedHashedPassword+" : "+password);
+            	updatePassword(user_id,BCrypt.hashpw(password, BCrypt.gensalt()));
+            	
+            	return loginUser(email,password);
+            }
+            
+        }
+
+        return user;
+    }
+
 	public static List<Email> getEmailsByUserId(int userId) throws SQLException {
 
 		String sql = "select id, email, isPrimary from MailMapper where user_id = ?";
@@ -132,5 +171,54 @@ public class userDao {
 		}
 		return rc>0;
 	}
+	
+	public static boolean changePrimaryEmail(int userId, int emailId, int primaryEmailId) throws SQLException {
+	    String sql1 = "UPDATE MailMapper SET isPrimary = 0 WHERE id = ?";
+	    String sql2 = "UPDATE MailMapper SET isPrimary = 1 WHERE id = ?";
+	    Connection connection = null;
+	    PreparedStatement ps1 = null;
+	    PreparedStatement ps2 = null;
+	    boolean isSuccess = false;
+	    System.out.println(primaryEmailId+" : "+emailId);
+
+	    try {
+	        connection = DBConnection.getConnection();
+	        connection.setAutoCommit(false);
+
+	        ps1 = connection.prepareStatement(sql1);
+	        ps1.setInt(1, primaryEmailId);
+	        int rc1 = ps1.executeUpdate();
+
+	        ps2 = connection.prepareStatement(sql2);
+	        ps2.setInt(1, emailId);
+	        int rc2 = ps2.executeUpdate();
+
+	        if (rc1 > 0 && rc2 > 0) {
+	            connection.commit(); 
+	            isSuccess = true;
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        if (connection != null) {
+	            try {
+	                connection.rollback(); 
+	            } catch (SQLException ex) {
+	                ex.printStackTrace(); 
+	            }
+	        }
+	    } finally {
+	        if (ps1 != null) {
+	            ps1.close();
+	        }
+	        if (ps2 != null) {
+	            ps2.close();
+	        }
+	        if (connection != null) {
+	            connection.close();
+	        }
+	    }
+	    return isSuccess;
+	}
+
 
 }

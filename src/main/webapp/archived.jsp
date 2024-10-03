@@ -28,7 +28,7 @@
 	  <a class="" href="dashboard.jsp">All Contacts</a>
 	<a class="" href="profile.jsp">Profile</a>
 	  <a class="active" href="archived.jsp">Archieved</a>
-	  <a href="#">Categories</a>
+	  <a href="categories.jsp">Categories</a>
 	  <a href="logout" class="logout">Logout</a>
 	</div>
 	<div class="content">
@@ -39,7 +39,6 @@
             <th>Email</th>
             <th>Phone</th>
             <th>Address</th>
-            <th>Others</th>
         </tr>
     </thead>
     <tbody>

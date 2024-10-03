@@ -59,6 +59,7 @@ public class ViewContactsServlet extends HttpServlet {
     	  user.setArchieves(archieves);
     	  
     	  user.setEmails(emails);
+    	  user.setPrimaryEmailId(user.getPrimaryEmail());
     	  
     	  session.setAttribute("contactsLoaded", true);
       } catch (SQLException e) {

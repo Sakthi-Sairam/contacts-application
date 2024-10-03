@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ page import="com.models.User" %>
 <%@ page import="com.models.Contact" %>
+<%@ page import="com.filters.SessionFilter" %>
 <%@ page import="java.util.*" %>
 
 
@@ -24,14 +25,15 @@
 	<div class="sidebar">
 	  <a class="active" href="dashboard.jsp">All Contacts</a>
 	<a class="" href="profile.jsp">Profile</a>
-	  <a href="archived.jsp">Archieved</a>
-	  <a href="#">Categories</a>
+	  <a href="archived.jsp">Archived</a>
+	  <a href="categories.jsp">Categories</a>
 	  <a href="logout" class="logout">Logout</a>
 	</div>
 <div class="content">
     <h1 class="mt-3 mb-3 heading ">Welcome to Dashboard</h1>
     <%
-        User user = (User) session.getAttribute("user");
+        //User user = (User) session.getAttribute("user"); 
+    	User user = (User) SessionFilter.getCurrentSession();
         if (user == null) {
             response.sendRedirect("login.jsp");
             return;
@@ -80,8 +82,10 @@
                 out.println("            <i class='bi bi-trash3-fill'></i>");
                 out.println("        </button>");
                 out.println("    </form>");
+                out.println("<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#editModal" + i.getMyContactsID() + "'><i class=\"bi bi-pencil-square\"></i></button>");
                 out.println("</td>");
                 out.println("</tr>");
+
             }
         } else {
             out.println("<tr><td colspan='4'>No contacts found.</td></tr>");
@@ -123,42 +127,7 @@
      	</tbody>
 	</table>
 	</div>
-<!-- 	
-	<h3 class="heading">Add new Contact</h3>
-	<div class="container">
-		<form action="addcontact" method="post" class="addcontact">
-		    <div class="form-group">
-		        <label for="friend_email">Email:</label>
-		        <input type="email" id="friend_email" name="friend_email" required>
-		    </div>
-		    <div class="form-group">
-		        <label for="alias_fnd_name">Alias:</label>
-		        <input type="text" id="alias_fnd_name" name="alias_fnd_name" required>
-		    </div>
-		    <div class="form-group">
-		        <label for="phone">Phone:</label>
-		        <input type="text" id="phone" name="phone" required>
-		    </div>
-		    <div class="form-group">
-		        <label for="address">Address:</label>
-		        <input type="text" id="address" name="address">
-		    </div>
-		    <div class="form-group">
-		        <label>Is Archived:</label><br>
-		        <input type="radio" name="isArchived" value="1"> Yes
-		        <input type="radio" name="isArchived" value="0" checked> No
-		    </div>
-		    <div class="form-group">
-		        <label>Is Favorite:</label><br>
-		        <input type="radio" name="isFavorite" value="1"> Yes
-		        <input type="radio" name="isFavorite" value="0" checked> No
-		    </div>
-		    <input type="hidden" name="user_id" value="<%= user.getUserId() %>">
-		    <input type="submit" class="mybutton" value="Add Contact">
-		</form>
-	</div>
- -->
-	
+
 	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
@@ -203,6 +172,63 @@
     </div>
   </div>
 </div>
+
+<% 
+if (contacts != null && !contacts.isEmpty()) {
+    for (Contact i : contacts) {
+%>
+
+<div class="modal fade" id="editModal<%= i.getMyContactsID() %>" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editModalLabel">Edit Contact</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <form action="editContact" method="post" class="editcontact addcontact">
+            <input type="hidden" name="contactId" value="<%= i.getMyContactsID() %>">
+            <div class="form-group">
+                <label for="friend_email">Email:</label>
+                <input type="email" id="friend_email" name="friend_email" value="<%= i.getFriend_email() %>" required>
+            </div>
+            <div class="form-group">
+                <label for="alias_fnd_name">Alias:</label>
+                <input type="text" id="alias_fnd_name" name="alias_fnd_name" value="<%= i.getAlias_name() %>" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="text" id="phone" name="phone" value="<%= i.getPhone() %>" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address" value="<%= i.getAddress() %>">
+            </div>
+            <div class="form-group">
+                <label>Is Archived:</label><br>
+                <input type="radio" name="isArchived" value="1" <%= i.getIsArchived()==1 ? "checked" : "" %>> Yes
+                <input type="radio" name="isArchived" value="0" <%= i.getIsArchived()==0 ? "checked" : "" %>> No
+            </div>
+            <div class="form-group">
+                <label>Is Favorite:</label><br>
+                <input type="radio" name="isFavorite" value="1" <%= i.getIsFavorite()==1 ? "checked" : "" %>> Yes
+                <input type="radio" name="isFavorite" value="0" <%= i.getIsFavorite()==0 ? "checked" : "" %>> No
+            </div>
+            <input type="submit" class="mybutton" value="Update Contact">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%
+
+            }
+        }
+        %>
+
+
 
     
 </div>

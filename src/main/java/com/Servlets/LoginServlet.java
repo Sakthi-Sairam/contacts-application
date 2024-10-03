@@ -1,6 +1,7 @@
 package com.Servlets;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,11 +28,17 @@ public class LoginServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        User user = userDao.loginUser(email, password);
+        User user=null;
+		try {
+			user = userDao.loginUser(email, password);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		if (user != null) {
 		    HttpSession session = request.getSession();
-		    session.setAttribute("user", user);
+		    session.setAttribute("user",user);
 
 //		    response.sendRedirect("dashboard.jsp");
 		    response.sendRedirect("viewcontacts");
