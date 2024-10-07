@@ -19,5 +19,8 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="/home/sakthi-pt7694/Downloads/jbcrypt-0.4.jar"/>
+	<classpathentry kind="lib" path="/home/sakthi-pt7694/Downloads/commons-dbcp2-2.5.0.jar"/>
+	<classpathentry kind="lib" path="/home/sakthi-pt7694/Downloads/commons-pool2-2.9.0.jar"/>
+	<classpathentry kind="lib" path="/home/sakthi-pt7694/Downloads/commons-logging-1.2.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -1,5 +1,7 @@
-package com.utils;
+//package com.utils;
 
+
+/**
 import java.sql.*;
 
 import com.models.User;
@@ -16,10 +18,42 @@ public class DBConnection {
     }
     
     
-    public static User getSession(HttpServletRequest request) {
-    	HttpSession session = request.getSession();
-    	User user = (User) session.getAttribute("user");
-    	return user;
-    }
+//    public static User getSession(HttpServletRequest request) {
+//    	HttpSession session = request.getSession();
+//    	User user = (User) session.getAttribute("user");
+//    	return user;
+//    }
 
 }
+*/
+
+package com.utils;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import org.apache.commons.dbcp2.BasicDataSource;
+
+public class DBConnection {
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/DemoContacts";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = null;
+
+    // Create a BasicDataSource instance
+    private static BasicDataSource dataSource = new BasicDataSource();
+
+    static {
+        dataSource.setUrl(DB_URL);
+        dataSource.setUsername(DB_USER);
+        dataSource.setPassword(DB_PASS);
+        dataSource.setMinIdle(5);
+        dataSource.setMaxIdle(10);
+        dataSource.setMaxTotal(25);
+    }
+
+    // Method to get a connection from the pool
+    public static Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+}
+
