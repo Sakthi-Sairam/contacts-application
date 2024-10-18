@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.Dao.ContactDao;
 import com.Dao.userDao;
+import com.filters.SessionFilter;
 import com.models.Contact;
 import com.models.Email;
 import com.models.User;
@@ -35,18 +36,9 @@ public class ViewContactsServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
+//        HttpSession session = request.getSession();
+        User user = (User) SessionFilter.getCurrentUser();
 
-//        if (session.getAttribute("contactsLoaded") == null) {
-//            try {
-//                List<Contact> contacts = ContactDao.getContactsByUserId(user.getUserId());
-//                user.setMyContacts(contacts); 
-//                session.setAttribute("contactsLoaded", true);
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//        }
       try {
     	  List<Contact> contacts = ContactDao.getContactsByUserId(user.getUserId());
     	  List<Contact> favourites = getFavourites(contacts);
@@ -59,10 +51,10 @@ public class ViewContactsServlet extends HttpServlet {
     	  user.setArchieves(archieves);
     	  
     	  user.setEmails(emails);
-    	  user.setPrimaryEmailId(user.getPrimaryEmail());
+    	  user.setPrimaryEmailId(user.findPrimaryEmail());     	  
     	  
-    	  session.setAttribute("contactsLoaded", true);
       } catch (SQLException e) {
+
     	  e.printStackTrace();
       }
         

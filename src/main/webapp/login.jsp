@@ -6,10 +6,10 @@
 <html>
 <head>
     <title>Login</title>
-<link rel="stylesheet" type="text/css" href="login.css">
-
-<style>
-body {
+    
+    <link rel="stylesheet" type="text/css" href="./styles/login.css">
+    <style type="text/css">
+    body {
     font-family: "Lato", sans-serif;
     display: flex;
     justify-content: center;
@@ -68,8 +68,9 @@ a{
     text-decoration: none;
     color: #e7ecf0b3;
 }
-
-</style>
+    
+    </style>
+    
 </head>
 <body>
     <div class="container">

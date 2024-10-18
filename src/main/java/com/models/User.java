@@ -9,7 +9,7 @@ public class User {
 	private int age;
 	private String address;
 	private String phone;
-	private int primaryEmailId;
+	private Integer primaryEmailId = null;
 	
 	List<Contact> myContacts;
 	List<Contact> favourites;
@@ -108,7 +108,7 @@ public class User {
 	public void setEmails(List<Email> emails) {
 		this.emails = emails;
 	}
-	public int getPrimaryEmail() {
+	public int findPrimaryEmail() {
 		int email_id=0;
 		for(Email i: emails) {
 			if(i.isPrimary==1) {
@@ -120,6 +120,9 @@ public class User {
 	}
 
 	public int getPrimaryEmailId() {
+		if(this.primaryEmailId == null) {
+			this.primaryEmailId = findPrimaryEmail();
+		}
 		return primaryEmailId;
 	}
 

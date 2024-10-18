@@ -33,16 +33,12 @@
     <h1 class="mt-3 mb-3 heading ">Welcome to Dashboard</h1>
     <%
         //User user = (User) session.getAttribute("user"); 
-    	User user = (User) SessionFilter.getCurrentSession();
-        if (user == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-        
-        Boolean contactsLoaded = (Boolean)session.getAttribute("contactsLoaded");
-        if(contactsLoaded==null || !contactsLoaded){
-        	response.sendRedirect("viewcontacts");
-        }
+    	User user = (User) SessionFilter.getCurrentUser();
+    	        
+        //Boolean contactsLoaded = (Boolean)session.getAttribute("contactsLoaded");
+        //if(contactsLoaded==null || !contactsLoaded){
+        	//response.sendRedirect("viewcontacts");
+        //}
     %>
     <h2 class="text-center">Hello <%= user.getFirstName() %>....</h2>
     

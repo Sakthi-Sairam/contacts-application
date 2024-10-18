@@ -4,7 +4,7 @@
 <%@ page import="com.models.Contact" %>
 <%@ page import="com.Dao.CategoriesDao" %>
 <%@ page import="java.util.*" %>
-
+<%@ page import="com.filters.SessionFilter" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,11 +28,8 @@
         <h1 class="mt-3">Manage Categories</h1>
         
         <%
-            User user = (User) session.getAttribute("user");
-            if (user == null) {
-                response.sendRedirect("login.jsp");
-                return;
-            }
+    		User user = (User)SessionFilter.getCurrentUser();
+
 
             List<CategoryDetails> categories = CategoriesDao.getCategoriesByUserId(user.getUserId());
             List<Contact> contacts = user.getMyContacts();

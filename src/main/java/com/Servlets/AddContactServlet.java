@@ -10,10 +10,22 @@ import java.sql.SQLException;
 
 import com.Dao.ContactDao;
 
+/***
+ * this AddContactServlet is used to add new contact to the user
+ */
+
 @WebServlet("/addcontact")
 public class AddContactServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
 
+/**
+ * post req for the form getcontact
+ * @param request
+ * @param response
+ * @throws servletException
+ * @throws IOException
+ */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String friend_email = request.getParameter("friend_email");
 		String alias_fnd_name = request.getParameter("alias_fnd_name");

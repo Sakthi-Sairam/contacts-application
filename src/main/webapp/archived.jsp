@@ -3,6 +3,7 @@
     
 <%@ page import="com.models.User" %>
 <%@ page import="com.models.Contact" %>
+<%@ page import="com.filters.SessionFilter" %>
 <%@ page import="java.util.*" %>
 
 
@@ -23,13 +24,9 @@
 </head>
 <body>
 
-    <%
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-    %>
+	<%
+	User user = (User)SessionFilter.getCurrentUser();
+	%>
     
     	<div class="sidebar">
 	  <a class="" href="dashboard.jsp">All Contacts</a>

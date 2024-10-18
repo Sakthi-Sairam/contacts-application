@@ -13,23 +13,24 @@ import java.sql.SQLException;
 import com.Dao.userDao;
 
 
-@WebServlet("/primaryemail")
+@WebServlet("/primaryemail/*")
 public class PrimaryEmailServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		int user_id = Integer.parseInt(request.getParameter("user_id"));
-        
-		int emailId = Integer.parseInt(request.getParameter("emailId"));
-		
-		int primaryEmailId = Integer.parseInt(request.getParameter("primaryEmailId"));
+		String pathInfo = request.getPathInfo();
+		System.out.println("path info of primary email" + pathInfo);
+	    String[] parts = pathInfo.split("/");
+	    int user_id = Integer.parseInt(parts[1]);
+	    int emailId = Integer.parseInt(parts[3]);
+	    int primaryEmailId = Integer.parseInt(parts[2]);
+	    
 		try {
 			userDao.changePrimaryEmail(user_id, emailId, primaryEmailId);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		response.sendRedirect("viewcontacts");
+		response.sendRedirect(request.getContextPath() + "/viewcontacts");
 	}
 
 }

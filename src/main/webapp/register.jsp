@@ -64,6 +64,9 @@ a{
     color: #e7ecf0b3;
 }
 </style>
+
+    <link rel="stylesheet" type="text/css" href="./styles/register.css">
+    
 </head>
 <body>
 <div class="container">

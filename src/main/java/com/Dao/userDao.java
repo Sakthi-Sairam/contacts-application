@@ -1,5 +1,6 @@
 package com.Dao;
 
+import com.utils.ContactsUtil;
 import com.utils.DBConnection;
 import com.models.Email;
 import com.models.User;
@@ -11,6 +12,11 @@ import org.mindrot.jbcrypt.BCrypt;
 
 public class userDao {
 	
+	/**
+	 * checks if email already exists
+	 * @param email user's email
+	 * @return true if email exists, false otherwise
+	 */
 	public static boolean mailCheck(String email) {
 		String checkEmailSQL = "SELECT email FROM MailMapper WHERE email = ?";
         ResultSet rs = null;
@@ -30,6 +36,12 @@ public class userDao {
         
 	}
 	
+	
+	/**
+	 * registers a new user
+	 * 
+	 * @return true if registration is successful, false otherwise
+	 */
     public static boolean registerUser(String password,String firstName, String lastName, String age, String address, String phone, String email ) {
         boolean registrationSuccessful = false;
         int userId;
@@ -69,6 +81,14 @@ public class userDao {
     	
     }
     
+    
+    /**
+     * updates the password for the user
+     * 
+     * @param user_id
+     * @param password
+     * @return true if update is successful, false otherwise
+     */
     public static boolean updatePassword(int user_id, String password) throws SQLException {
 		String sql = "update userdata set password=? where user_id=?";
 		int rc = 0;
@@ -84,6 +104,14 @@ public class userDao {
     	
     }
     
+    
+    /**
+     * logs in the user by email and password
+     * 
+     * @param email
+     * @param password
+     * @return user object if login successful, null otherwise
+     */
     public static User loginUser(String email, String password) throws SQLException {
         ResultSet rs = null;
         String sql = "SELECT a.user_id, a.first_name, a.password, a.last_name, a.age, a.address, a.phone FROM userdata a JOIN MailMapper b ON a.user_id = b.user_id WHERE b.email = ?";
@@ -101,7 +129,6 @@ public class userDao {
             if (rs.next()) {
                 storedHashedPassword = rs.getString("password");
                 user_id = rs.getInt("user_id");
-                System.out.println("Stored Hashed Password: " + storedHashedPassword);
 
                 boolean isCorrectPassword = BCrypt.checkpw(password, storedHashedPassword);
                 if (isCorrectPassword) {
@@ -120,7 +147,6 @@ public class userDao {
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
-            System.out.println("Password validation failed: " + e.getMessage());
             
             if(password.equals(storedHashedPassword)) {
             	System.out.println(user_id+" "+storedHashedPassword+" : "+password);
@@ -133,7 +159,14 @@ public class userDao {
 
         return user;
     }
-
+    
+    
+    /**
+     * gets all emails for the user by user id
+     * 
+     * @param userId
+     * @return list of emails
+     */
 	public static List<Email> getEmailsByUserId(int userId) throws SQLException {
 
 		String sql = "select id, email, isPrimary from MailMapper where user_id = ?";
@@ -157,6 +190,14 @@ public class userDao {
 		return emails;
 	}
 	
+	
+	/**
+	 * adds a new email for the user
+	 * 
+	 * @param userId
+	 * @param email
+	 * @return true if email is added, false otherwise
+	 */
 	public static boolean addEmailByUserId(int userId, String email) throws SQLException {
 
 		String sql = "insert into MailMapper (user_id,email,isPrimary) values (?,?,0)";
@@ -172,6 +213,15 @@ public class userDao {
 		return rc>0;
 	}
 	
+	
+	/**
+	 * changes the primary email for the user
+	 * 
+	 * @param userId
+	 * @param emailId
+	 * @param primaryEmailId
+	 * @return true if change is successful, false otherwise
+	 */
 	public static boolean changePrimaryEmail(int userId, int emailId, int primaryEmailId) throws SQLException {
 	    String sql1 = "UPDATE MailMapper SET isPrimary = 0 WHERE id = ?";
 	    String sql2 = "UPDATE MailMapper SET isPrimary = 1 WHERE id = ?";
@@ -219,6 +269,46 @@ public class userDao {
 	    }
 	    return isSuccess;
 	}
+	
+	
+	/**
+	 * gets user details by user id
+	 * 
+	 * @param userId
+	 * @return user object with details
+	 */
+    public static User getUserById(int userId) {
+        String sql = "SELECT user_id, first_name, last_name, age, address, phone FROM userdata WHERE user_id = ?";
+        User user = null;
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                // Retrieve user details
+                user = new User(
+                    rs.getInt("user_id"),
+                    rs.getString("first_name"),
+                    rs.getString("last_name"),
+                    rs.getInt("age"),
+                    rs.getString("address"),
+                    rs.getString("phone")
+                );
+                
+                // Populate additional information like emails
+                List<Email> emails = getEmailsByUserId(userId);
+                user.setEmails(emails);
+                ContactsUtil.getContacts(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
 
 
 }

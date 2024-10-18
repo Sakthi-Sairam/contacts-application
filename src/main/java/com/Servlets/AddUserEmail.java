@@ -7,32 +7,44 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-
 import com.Dao.userDao;
 
-@WebServlet("/addemail")
+@WebServlet("/addemail/*")
 public class AddUserEmail extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String email = request.getParameter("email");
-		int user_id = Integer.parseInt(request.getParameter("user_id"));
-		boolean isAdded =false;
-        if(!userDao.mailCheck(email)) {
-        	try {
-				isAdded = userDao.addEmailByUserId(user_id, email);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+    /**
+     * Handles post request of submission of the addemail form
+     * @param request
+     * @param response
+     * @throws SevletException
+     * @throws IOException
+     *
+     */
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String email = request.getParameter("email");
+        String pathInfo = request.getPathInfo();
+        
+        String[] parts = pathInfo.split("/");
+        System.out.println("two parts are " + parts[0]+" : "+parts[1]);
+        int user_id = Integer.parseInt(parts[1]);
+        
+        boolean isAdded = false;
+        if (!userDao.mailCheck(email)) {
+            try {
+                isAdded = userDao.addEmailByUserId(user_id, email);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        
         if (isAdded) {
-			response.sendRedirect("dashboard.jsp");
+            response.sendRedirect(request.getContextPath() + "/profile.jsp");
         } else {
-            request.setAttribute("result", "Email might already be in use.");
-            request.getRequestDispatcher("profile.jsp").forward(request, response);
+//            request.setAttribute("result", "Email might already be in use.");
+//            request.getRequestDispatcher("/profile.jsp").forward(request, response);
+            
+            response.sendRedirect(request.getContextPath() + "/profile.jsp");
         }
-//        return isAdded;
-	      
-	}
-
+    }
 }
