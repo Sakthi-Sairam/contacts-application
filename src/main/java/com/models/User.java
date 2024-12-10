@@ -16,6 +16,12 @@ public class User {
 	List<Contact> archieves;
 	List<Email> emails;
 	
+	public User() {
+		this.myContacts = new ArrayList<>();
+		this.favourites = new ArrayList<>();
+		this.archieves = new ArrayList<>();
+		this.emails = new ArrayList<>();
+	}
 	public User(int userId, String firstName, String lastName, int age, String address, String phone) {
 		this.userId = userId;
 		this.firstName = firstName;

@@ -1,15 +1,22 @@
 package com.models;
 
 public class Contact {
+	@Column(name = "MyContactsID")
 	private int MyContactsID;
+	@Column(name = "alias_fnd_name")
 	private String alias_name;
+	@Column(name = "friend_email")
 	private String friend_email;
+	@Column(name = "phone")
 	private String phone;
+	@Column(name = "address")
 	private String address;
+	@Column(name = "isArchived")
 	private int isArchived;
+	@Column(name = "isFavorite")
 	private int isFavorite;
-	public Contact(int MyContactsID, String alias_name, String friend_email, String phone, String address,
-			int isArchived, int isFavorite) {
+	public Contact() {}
+	public Contact(int MyContactsID, String alias_name, String friend_email, String phone, String address, int isArchived, int isFavorite) {
 		this.MyContactsID = MyContactsID;
 		this.alias_name = alias_name;
 		this.friend_email = friend_email;

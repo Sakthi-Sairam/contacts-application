@@ -52,8 +52,13 @@ public class DBConnection {
     }
 
     // Method to get a connection from the pool
-    public static Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
+    public static Connection getConnection()  {
+        try {
+			return dataSource.getConnection();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
     }
 }
 

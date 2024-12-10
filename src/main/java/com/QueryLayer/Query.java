@@ -7,9 +7,11 @@ public class Query {
     private int numberOfCols;
     private List<Object> parameters;
     private QueryType queryType;
-
+    private List<Object> tables;
+    
     public Query() {
         parameters = new ArrayList<>();
+        tables = new ArrayList<>();
     }
 
     public int getNumberOfCols() {
@@ -44,5 +46,8 @@ public class Query {
 
     public Object[] getParametersArray() {
         return parameters.toArray();
+    }
+    public List<Object> getTables(){
+    	return this.tables;
     }
 }

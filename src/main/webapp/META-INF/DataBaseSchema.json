@@ -1,0 +1,204 @@
+{
+  "DemoContacts": [
+    {
+      "name": "CategoryDetails",
+      "primary_key": "categoryId",
+      "columns": [
+        {
+          "name": "categoryId",
+          "type": "int",
+          "null": false,
+          "auto_increment": true
+        },
+        {
+          "name": "categoryName",
+          "type": "varchar(255)",
+          "null": false
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "null": false,
+          "foreign_key": true
+        }
+      ]
+    },
+    {
+      "name": "CategoryList",
+      "primary_key": "id",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "null": false,
+          "auto_increment": true
+        },
+        {
+          "name": "categoryId",
+          "type": "int",
+          "null": false,
+          "foreign_key": true
+        },
+        {
+          "name": "MyContactsID",
+          "type": "int",
+          "null": false,
+          "foreign_key": true
+        }
+      ]
+    },
+    {
+      "name": "MailMapper",
+      "primary_key": "id",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "null": false,
+          "auto_increment": true
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "null": true,
+          "foreign_key": true
+        },
+        {
+          "name": "email",
+          "type": "varchar(255)",
+          "null": false,
+          "unique": true
+        },
+        {
+          "name": "isPrimary",
+          "type": "tinyint(1)",
+          "null": true,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "name": "MyContactsData",
+      "primary_key": "MyContactsID",
+      "columns": [
+        {
+          "name": "MyContactsID",
+          "type": "int",
+          "null": false,
+          "auto_increment": true
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "null": true,
+          "foreign_key": true
+        },
+        {
+          "name": "friend_email",
+          "type": "varchar(255)",
+          "null": false
+        },
+        {
+          "name": "alias_fnd_name",
+          "type": "varchar(255)",
+          "null": true
+        },
+        {
+          "name": "phone",
+          "type": "varchar(15)",
+          "null": true
+        },
+        {
+          "name": "address",
+          "type": "varchar(255)",
+          "null": true
+        },
+        {
+          "name": "isArchived",
+          "type": "tinyint(1)",
+          "null": true
+        },
+        {
+          "name": "isFavorite",
+          "type": "tinyint(1)",
+          "null": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp",
+          "null": true,
+          "default": "CURRENT_TIMESTAMP",
+          "extra": "DEFAULT_GENERATED"
+        }
+      ]
+    },
+    {
+      "name": "sessions",
+      "primary_key": "sessionId",
+      "columns": [
+        {
+          "name": "sessionId",
+          "type": "varchar(36)",
+          "null": false
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "null": false
+        },
+        {
+          "name": "lastAccessedTime",
+          "type": "bigint",
+          "null": true
+        },
+        {
+          "name": "createdAt",
+          "type": "bigint",
+          "null": true
+        }
+      ]
+    },
+    {
+      "name": "userdata",
+      "primary_key": "user_id",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "int",
+          "null": false,
+          "auto_increment": true
+        },
+        {
+          "name": "password",
+          "type": "varchar(255)",
+          "null": false
+        },
+        {
+          "name": "first_name",
+          "type": "varchar(255)",
+          "null": false
+        },
+        {
+          "name": "last_name",
+          "type": "varchar(255)",
+          "null": true
+        },
+        {
+          "name": "age",
+          "type": "int",
+          "null": true
+        },
+        {
+          "name": "address",
+          "type": "varchar(255)",
+          "null": true
+        },
+        {
+          "name": "phone",
+          "type": "varchar(15)",
+          "null": false
+        }
+      ]
+    }
+  ]
+}

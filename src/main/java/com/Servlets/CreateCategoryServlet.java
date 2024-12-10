@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 
 import com.Dao.CategoriesDao;
 
@@ -20,17 +21,15 @@ public class CreateCategoryServlet extends HttpServlet {
             int userId = Integer.parseInt(request.getParameter("userId"));
 //            System.out.println(request.getParameter("categoryName")+" : "+request.getParameter("userId"));
 
-            boolean success = CategoriesDao.createCategory(userId, categoryName);
+            try {
+				boolean success = CategoriesDao.createCategory(userId, categoryName);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
-//            System.out.println(request.getParameter("categoryName")+" : "+request.getParameter("userId"));
-//            RequestDispatcher rd=request.getRequestDispatcher("categories.jsp");
             response.sendRedirect("categories.jsp");
-//            if (success) {
-//            	request.setAttribute("addResult", "<div class='alert alert-success'>Category created successfully!</div>");
-//            } else {
-//            	request.setAttribute("addResult","<div class='alert alert-danger'>Failed to create category!</div>");
-//            }
-//            rd.forward(request, response);
+
 	}
 
 }

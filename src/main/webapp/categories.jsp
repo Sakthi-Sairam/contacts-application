@@ -28,18 +28,15 @@
         <h1 class="mt-3">Manage Categories</h1>
         
         <%
-    		User user = (User)SessionFilter.getCurrentUser();
+                User user = (User)SessionFilter.getCurrentUser();
 
 
-            List<CategoryDetails> categories = CategoriesDao.getCategoriesByUserId(user.getUserId());
-            List<Contact> contacts = user.getMyContacts();
-        %>
-        
-        <%
-        String addResult = (String)request.getAttribute("addResult");
-        if (addResult!=null)out.println(addResult);
-        
-        %>
+				List<CategoryDetails> categories = CategoriesDao.getCategoriesByUserId(user.getUserId());
+				List<Contact> contacts = user.getMyContacts();
+
+                String addResult = (String)request.getAttribute("addResult");
+                if (addResult!=null)out.println(addResult);
+          %>
 
         <form action="createCategory" method="post">
             <div class="mb-3">

@@ -73,7 +73,7 @@ public class SessionManager {
 
         if (session != null) {
             // If session exists, update lastAccessedTime
-            session.setLastAccessedTime(LocalDateTime.now());
+            session.setLastAccessedTime(System.currentTimeMillis());
         } else {
             // If session does not exist, create a new one
             session = new Session(userId);
@@ -101,10 +101,10 @@ public class SessionManager {
 
     // Clean up sessions that have been inactive for more than 30 minutes
     public static void cleanExpiredSessions(int TIMEOUT_MINUTES) {
-        LocalDateTime now = LocalDateTime.now();
+        long now = System.currentTimeMillis();
 
         sessionMap.forEach((sessionId, session) -> {
-            if (session.getLastAccessedTime().plusMinutes(TIMEOUT_MINUTES).isBefore(now)) {
+            if (session.getLastAccessedTime()+(TIMEOUT_MINUTES*60000)<now) {
             	System.out.println(sessionId+" removed");
                 sessionMap.remove(sessionId); // Remove from session map
                 try {
@@ -116,8 +116,8 @@ public class SessionManager {
         });
     }
     public static void cleanExpiredSessionsFromDB(int TIMEOUT_MINUTES) throws SQLException {
-        LocalDateTime now = LocalDateTime.now();
-        SessionDao.deleteExpiredSessions(now.minusMinutes(TIMEOUT_MINUTES));
+        long now = System.currentTimeMillis();
+        SessionDao.deleteExpiredSessions(now - TIMEOUT_MINUTES*60000 );
     }
 
     // Batch update sessions in the database

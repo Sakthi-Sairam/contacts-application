@@ -160,7 +160,7 @@
 		        <input type="radio" name="isFavorite" value="1"> Yes
 		        <input type="radio" name="isFavorite" value="0" checked> No
 		    </div>
-		    <input type="hidden" name="user_id" value="<%= user.getUserId() %>">
+		    <input type="hidden" name="user_id" value="<%=user.getUserId()%>">
 		    <input type="submit" class="mybutton" value="Add Contact">
 		</form>
 	</div>
@@ -219,7 +219,6 @@ if (contacts != null && !contacts.isEmpty()) {
   </div>
 </div>
 <%
-
             }
         }
         %>

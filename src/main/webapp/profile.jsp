@@ -88,34 +88,34 @@
 
 					<%
 					List<Email> emails = user.getEmails();
-					if (emails != null && !emails.isEmpty()) {
-						for (Email i : emails) {
-							out.println("<tr>");
-							out.println("<td>" + i.getEmail() + "</td>");
-							out.println("<td>");
-							String endPoint = String.format("primaryemail/%d/%d/%d",user.getUserId(),user.getPrimaryEmailId(),i.getId());
-							out.println("    <form action='"+ endPoint +"' method='post' style='display:inline;'>");
-							out.println(
-							"        <button type='submit' class='btn btn-warning' title='primary email' onclick='return confirm(\"Are you sure you want to change this as primary?\");'>");
-							out.println(
-							i.getIsPrimary() == 1 ? " <img src='styles/star.svg' alt='Star Icon' style='width: 20px; height: 20px;'"
-									: "<img src='styles/transparentstar.svg' alt='Star Icon' style='width: 20px; height: 20px;'");
-							out.println("        </button>");
-							out.println("    </form>");
-							out.println("</td>");
-							out.println("</tr>");
-						}
-					} else {
-						out.println("<tr><td colspan='4'>No emails found.</td></tr>");
-					}
+											if (emails != null && !emails.isEmpty()) {
+												for (Email i : emails) {
+													out.println("<tr>");
+													out.println("<td>" + i.getEmail() + "</td>");
+													out.println("<td>");
+													String endPoint = String.format("primaryemail/%d/%d/%d",user.getUserId(),user.getPrimaryEmailId(),i.getId());
+													out.println("    <form action='"+ endPoint +"' method='post' style='display:inline;'>");
+													out.println(
+													"        <button type='submit' class='btn btn-warning' title='primary email' onclick='return confirm(\"Are you sure you want to change this as primary?\");'>");
+													out.println(
+													i.getIsPrimary() == 1 ? " <img src='styles/star.svg' alt='Star Icon' style='width: 20px; height: 20px;'"
+															: "<img src='styles/transparentstar.svg' alt='Star Icon' style='width: 20px; height: 20px;'");
+													out.println("        </button>");
+													out.println("    </form>");
+													out.println("</td>");
+													out.println("</tr>");
+												}
+											} else {
+												out.println("<tr><td colspan='4'>No emails found.</td></tr>");
+											}
 					%>
 				</tbody>
 			</table>
 
 			<%
 			String result = (String) request.getAttribute("result");
-			if (result != null)
-				out.println(result);
+					if (result != null)
+						out.println(result);
 			%>
 
 			<button type="button" class="mybutton mt-2" data-bs-toggle="modal"

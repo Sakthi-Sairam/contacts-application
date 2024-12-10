@@ -20,8 +20,6 @@ public class ContactDao {
 	           int rc = ps.executeUpdate();
 	           return rc>0;
 	       }
-	    
-		
 	}
 
 	public static List<Contact> getContactsByUserId(int userId) throws SQLException {
@@ -51,16 +49,63 @@ public class ContactDao {
 		return contacts;
 	}
 	
+//	public static boolean deleteContact(int MyContactId) throws SQLException {
+//		String sql = "delete from MyContactsData where MyContactsID = ?";
+//		int rc=0;
+//		try(Connection connection = DBConnection.getConnection();
+//				PreparedStatement ps = connection.prepareStatement(sql)){
+//			ps.setInt(1, MyContactId);
+//			rc = ps.executeUpdate();
+//			
+//		}
+//        return rc>0;
+//	}
+	
 	public static boolean deleteContact(int MyContactId) throws SQLException {
-		String sql = "delete from MyContactsData where MyContactsID = ?";
-		int rc=0;
-		try(Connection connection = DBConnection.getConnection();
-				PreparedStatement ps = connection.prepareStatement(sql)){
-			ps.setInt(1, MyContactId);
-			rc = ps.executeUpdate();
-			
-		}
-        return rc>0;
+	    String sql1 = "delete from CategoryList where MyContactsID =?";
+	    String sql2 = "delete from MyContactsData where MyContactsID = ?";
+	    Connection connection = null;
+	    PreparedStatement ps1 = null;
+	    PreparedStatement ps2 = null;
+	    boolean isSuccess = false;
+
+	    try {
+	        connection = DBConnection.getConnection();
+	        connection.setAutoCommit(false);
+
+	        ps1 = connection.prepareStatement(sql1);
+	        ps1.setInt(1, MyContactId);
+	        int rc1 = ps1.executeUpdate();
+
+	        ps2 = connection.prepareStatement(sql2);
+	        ps2.setInt(1, MyContactId);
+	        int rc2 = ps2.executeUpdate();
+
+	        if (rc1 > 0 && rc2 > 0) {
+	            connection.commit(); 
+	            isSuccess = true;
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        if (connection != null) {
+	            try {
+	                connection.rollback(); 
+	            } catch (SQLException ex) {
+	                ex.printStackTrace(); 
+	            }
+	        }
+	    }finally {
+	        if (ps1 != null) {
+	            ps1.close();
+	        }
+	        if (ps2 != null) {
+	            ps2.close();
+	        }
+	        if (connection != null) {
+	            connection.close();
+	        }
+	    }
+		return isSuccess;
 	}
 	
 	public static boolean updateContact(Contact contact) throws SQLException {

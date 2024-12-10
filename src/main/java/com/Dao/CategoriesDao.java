@@ -1,117 +1,174 @@
 package com.Dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import com.QueryLayer.QueryBuilder;
+import com.QueryLayer.QueryExecutor;
+import com.QueryLayer.DatabaseSchemaEnums.CategoryDetailsColumn;
+import com.QueryLayer.DatabaseSchemaEnums.CategoryListColumn;
+import com.QueryLayer.DatabaseSchemaEnums.MyContactsDataColumn;
+import com.QueryLayer.DatabaseSchemaEnums.Table;
+import com.models.CategoryDetails;
+import com.models.Contact;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.models.*;
-import com.utils.DBConnection;
-
 public class CategoriesDao {
-    
 
-    public static boolean createCategory(int userId, String categoryName) {
-        String sql = "INSERT INTO CategoryDetails (categoryName, user_id) VALUES (?, ?)";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, categoryName);
-            ps.setInt(2, userId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public static boolean createCategory(int userId, String categoryName) throws SQLException {
+        QueryExecutor executor = new QueryExecutor();
+        QueryBuilder qb = new QueryBuilder();
+
+        qb.insert(Table.CATEGORY_DETAILS)
+          .columns(CategoryDetailsColumn.CATEGORY_NAME, CategoryDetailsColumn.USER_ID)
+          .values(categoryName, userId);
+
+        int rowCount = executor.executeUpdate(qb);
+        return rowCount > 0;
     }
 
-    public static List<CategoryDetails> getCategoriesByUserId(int userId) {
-        String sql = "SELECT categoryId, categoryName FROM CategoryDetails WHERE user_id = ?";
-        List<CategoryDetails> categories = new ArrayList<>();
+//    public static List<CategoryDetails> getCategoriesByUserId(int userId) throws SQLException {
+//        QueryBuilder qb = new QueryBuilder();
+//        QueryExecutor executor = new QueryExecutor();
+//        List<CategoryDetails> categories = new ArrayList<>();
+//
+//        qb.select(CategoryDetailsColumn.CATEGORY_ID, CategoryDetailsColumn.CATEGORY_NAME)
+//          .from(Table.CATEGORY_DETAILS)
+//          .where(CategoryDetailsColumn.USER_ID, "=", userId, true);
+//
+//        List<Object[]> results = executor.executeQuery(qb);
+//        for (Object[] row : results) {
+//            categories.add(new CategoryDetails((Integer) row[0], (String) row[1]));
+//        }
+//
+//        return categories;
+//    }
+    
+    public static List<CategoryDetails> getCategoriesByUserId(int userId) throws SQLException {
+        QueryBuilder qb = new QueryBuilder();
+        QueryExecutor executor = new QueryExecutor();
+
+        qb.select(CategoryDetailsColumn.CATEGORY_ID, CategoryDetailsColumn.CATEGORY_NAME)
+          .from(Table.CATEGORY_DETAILS)
+          .where(CategoryDetailsColumn.USER_ID, "=", userId, true);
+
+        List<CategoryDetails> categories = executor.executeQuery(qb, CategoryDetails.class);
         
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                CategoryDetails CategoryDetails = new CategoryDetails(rs.getInt("categoryId"), rs.getString("categoryName"));
-                categories.add(CategoryDetails);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        // Optional: Add logging or additional error checking
+        if (categories == null) {
+            System.err.println("No categories found for user ID: " + userId);
+            return new ArrayList<>(); // Return empty list instead of null
         }
         
         return categories;
     }
-    
 
-    public static boolean addContactToCategory(int categoryId, int contactId) {
-        String sql = "INSERT INTO CategoryList (categoryId, MyContactsID) VALUES (?, ?)";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, categoryId);
-            ps.setInt(2, contactId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+
+    public static boolean addContactToCategory(int categoryId, int contactId) throws SQLException {
+        QueryBuilder qb = new QueryBuilder();
+        QueryExecutor executor = new QueryExecutor();
+
+        qb.insert(Table.CATEGORY_LIST)
+          .columns(CategoryListColumn.CATEGORY_ID, CategoryListColumn.MY_CONTACTS_ID)
+          .values(categoryId, contactId);
+
+        int rowCount = executor.executeUpdate(qb);
+        return rowCount > 0;
     }
-    public static boolean checkContactPresentInCategory(int categoryId, int contactId) {
-        String sql = "select * from CategoryList where categoryId=? and MyContactsID=?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, categoryId);
-            ps.setInt(2, contactId);
-            return ps.executeQuery().next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+
+//    public static boolean checkContactPresentInCategory(int categoryId, int contactId) throws SQLException {
+//        QueryBuilder qb = new QueryBuilder();
+//        QueryExecutor executor = new QueryExecutor();
+//
+//        qb.select(CategoryListColumn.CATEGORY_ID)
+//          .from(Table.CATEGORY_LIST)
+//          .where(CategoryListColumn.CATEGORY_ID, "=", categoryId, true)
+//          .and()
+//          .where(CategoryListColumn.MY_CONTACTS_ID, "=", contactId);
+//
+//        List<Object[]> results = executor.executeQuery(qb);
+//        if(results.size()==0) return false;
+//        return true;
+//    }
+    public static boolean checkContactPresentInCategory(int categoryId, int contactId) throws SQLException {
+        QueryBuilder qb = new QueryBuilder();
+        QueryExecutor executor = new QueryExecutor();
+
+        qb.select(CategoryListColumn.CATEGORY_ID)
+          .from(Table.CATEGORY_LIST)
+          .where(CategoryListColumn.CATEGORY_ID, "=", categoryId, true)
+          .and()
+          .where(CategoryListColumn.MY_CONTACTS_ID, "=", contactId);
+
+        List<CategoryDetails> results = executor.executeQuery(qb, CategoryDetails.class);
+
+        // Check if any result exists
+        return !results.isEmpty();
     }
-    
+
     public static boolean deleteCategory(int categoryId) throws SQLException {
-    	String sql1 = "delete from CategoryList where categoryId=?";
-    	String sql2 = "delete from CategoryDetails where categoryId=?";
-    	int rc;
-    	 
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement ps1 = connection.prepareStatement(sql1);
-        		PreparedStatement ps2 = connection.prepareStatement(sql2)) {
-            ps1.setInt(1, categoryId);
-            ps1.executeUpdate();
-            ps2.setInt(1, categoryId);
-            rc = ps2.executeUpdate();
-        }
-		return rc>0;
-    	
+        QueryExecutor executor = new QueryExecutor();
+
+        // Delete from CategoryList first
+        QueryBuilder qb1 = new QueryBuilder();
+        qb1.delete(Table.CATEGORY_LIST)
+           .where(CategoryListColumn.CATEGORY_ID, "=", categoryId, true);
+
+        // Delete from CategoryDetails
+        QueryBuilder qb2 = new QueryBuilder();
+        qb2.delete(Table.CATEGORY_DETAILS)
+           .where(CategoryDetailsColumn.CATEGORY_ID, "=", categoryId, true);
+
+        int rowCount1 = executor.executeUpdate(qb1);
+        int rowCount2 = executor.executeUpdate(qb2);
+
+        return rowCount1 > 0 || rowCount2 > 0;
     }
 
-    public static List<Contact> getContactsByCategoryId(int categoryId) {
-        String sql = "SELECT c.MyContactsID, c.alias_fnd_name, c.friend_email, c.phone, c.address FROM MyContactsData c INNER JOIN CategoryList cl ON c.MyContactsID = cl.MyContactsID WHERE cl.categoryId = ?";
-        List<Contact> contacts = new ArrayList<>();
-        
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, categoryId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Contact contact = new Contact(
-                    rs.getInt("MyContactsID"),
-                    rs.getString("alias_fnd_name"),
-                    rs.getString("friend_email"),
-                    rs.getString("phone"),
-                    rs.getString("address"),
-                    0,
-                    0
-                );
-                contacts.add(contact);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
+//    public static List<Contact> getContactsByCategoryId(int categoryId) throws SQLException {
+//        QueryBuilder qb = new QueryBuilder();
+//        QueryExecutor executor = new QueryExecutor();
+//
+//        qb.select(MyContactsDataColumn.MY_CONTACTS_ID, MyContactsDataColumn.ALIAS_FND_NAME,
+//        		MyContactsDataColumn.FRIEND_EMAIL, MyContactsDataColumn.PHONE,
+//        		MyContactsDataColumn.ADDRESS)
+//          .from(Table.MY_CONTACTS_DATA)
+//          .join(Table.CATEGORY_LIST, CategoryListColumn.MY_CONTACTS_ID,
+//        		  MyContactsDataColumn.MY_CONTACTS_ID)
+//          .where(CategoryListColumn.CATEGORY_ID, "=", categoryId, true);
+//
+//        List<Object[]> results = executor.executeQuery(qb);
+//        List<Contact> contacts = new ArrayList<>();
+//
+//        for (Object[] row : results) {
+//            contacts.add(new Contact(
+//                (Integer) row[0],
+//                (String) row[1],
+//                (String) row[2],
+//                (String) row[3],
+//                (String) row[4],
+//                0,
+//                0
+//            ));
+//        }
+//
+//        return contacts;
+//    }
+    public static List<Contact> getContactsByCategoryId(int categoryId) throws SQLException {
+        QueryBuilder qb = new QueryBuilder();
+        QueryExecutor executor = new QueryExecutor();
+
+        qb.select(MyContactsDataColumn.MY_CONTACTS_ID, MyContactsDataColumn.ALIAS_FND_NAME,
+        		MyContactsDataColumn.FRIEND_EMAIL, MyContactsDataColumn.PHONE,
+        		MyContactsDataColumn.ADDRESS, MyContactsDataColumn.IS_ARCHIVED, MyContactsDataColumn.IS_FAVORITE)
+          .from(Table.MY_CONTACTS_DATA)
+          .join(Table.CATEGORY_LIST, CategoryListColumn.MY_CONTACTS_ID,
+        		  MyContactsDataColumn.MY_CONTACTS_ID)
+          .where(CategoryListColumn.CATEGORY_ID, "=", categoryId, true);
+
+        List<Contact> contacts = executor.executeQuery(qb, Contact.class);
+        System.out.println(contacts);
+
         return contacts;
     }
 }

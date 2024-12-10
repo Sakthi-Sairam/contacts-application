@@ -1,18 +1,22 @@
 package com.filters;
 
 import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.logging.Logger;
 
 import com.Dao.userDao;
+import com.managers.LoggerManager;
 import com.managers.SessionManager;
 import com.models.Session;
 import com.models.User;
 
+@WebFilter("*")
 public class SessionFilter implements Filter {
     private static final ThreadLocal<User> threadLocalSession = new ThreadLocal<>();
     private static final int TIMEOUT_MINUTES = 5; 
@@ -20,14 +24,22 @@ public class SessionFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     	
+    	final Logger accessLogger = LoggerManager.getAccessLogger();
+    	
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         
 //        System.out.println(SessionManager.sessionMap);
         String requestURI = httpRequest.getRequestURI();
+        
 
         // Allow unauthenticated access to login and registration pages
         if (requestURI.endsWith("login.jsp") || requestURI.endsWith("register.jsp") || requestURI.endsWith("login") || requestURI.endsWith("register")) {
+            String sessionId = getSessionIdFromCookies(httpRequest.getCookies());
+            if (sessionId != null && SessionManager.getSession(sessionId) != null) {
+                httpResponse.sendRedirect("dashboard.jsp");
+                return;
+            }
         	System.out.println("new request.............");
             chain.doFilter(request, response);
             return;
@@ -40,6 +52,8 @@ public class SessionFilter implements Filter {
             httpResponse.sendRedirect("login.jsp");
             return;
         }
+        // Log access details
+        accessLogger.info("Accessed URI: " + requestURI + " | Session ID: " + sessionId + " | Time: " + System.currentTimeMillis());
 
         // Retrieve session from the SessionManager
         Session storedSession = SessionManager.getSession(sessionId);
@@ -50,12 +64,11 @@ public class SessionFilter implements Filter {
             return;
         }
 
-        LocalDateTime lastAccessedTime = storedSession.getLastAccessedTime();
-        LocalDateTime now = LocalDateTime.now();
+        long lastAccessedTime = storedSession.getLastAccessedTime();
+        long now = System.currentTimeMillis();
 
 
-        if (lastAccessedTime.plusMinutes(TIMEOUT_MINUTES).isBefore(now)) {
-
+        if (lastAccessedTime + TIMEOUT_MINUTES * 60000 < now) {
             // Remove from session map if timed out
             SessionManager.removeSession(sessionId);
             httpResponse.sendRedirect("login.jsp");
@@ -76,6 +89,8 @@ public class SessionFilter implements Filter {
         try {
         	request.setAttribute("sessionId",sessionId);
             chain.doFilter(request, response);
+        }catch(Exception e) {
+        	accessLogger.severe("Error processing request: " + e.getMessage());
         } finally {
             threadLocalSession.remove();
         }

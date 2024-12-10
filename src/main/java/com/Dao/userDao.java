@@ -298,7 +298,7 @@ public class userDao {
                     rs.getString("phone")
                 );
                 
-                // Populate additional information like emails
+                // Populate emails
                 List<Email> emails = getEmailsByUserId(userId);
                 user.setEmails(emails);
                 ContactsUtil.getContacts(user);

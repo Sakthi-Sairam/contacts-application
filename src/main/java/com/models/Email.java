@@ -1,6 +1,7 @@
 package com.models;
 
 public class Email {
+	public Email() {}
 	public Email(int id, String email, int isPrimary) {
 		this.id = id;
 		this.email = email;
