@@ -14,7 +14,7 @@ import com.Dao.SessionDao;
 import com.filters.SessionFilter;
 import com.managers.SessionManager;
 
-@WebServlet("/logout")
+//@WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

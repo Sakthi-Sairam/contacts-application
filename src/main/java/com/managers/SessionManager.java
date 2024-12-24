@@ -6,145 +6,179 @@ import com.Dao.SessionDao;
 import com.Dao.userDao;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SessionManager {
-	private static int MAX_HASHMAP_SIZE = 5;
-    public static final Map<String, Session> sessionMap = Collections.synchronizedMap( new LinkedHashMap<>(5,0.75f,true){
-    	private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = Logger.getLogger(SessionManager.class.getName());
+    
+    public static final int TIMEOUT_MINUTES = 5;
+    private static final int MAX_HASHMAP_SIZE = 5;
 
-		@Override
-        protected boolean removeEldestEntry(Map.Entry<String, Session> eldest)
-        {
+    // Thread-safe synchronized map for sessions
+    public static final Map<String, Session> sessionMap = Collections.synchronizedMap(new LinkedHashMap<>(5, 0.75f, true) {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Session> eldest) {
             return size() > MAX_HASHMAP_SIZE;
         }
     });
     
-    public static final HashMap<Integer, User> userMap = new LinkedHashMap<>(5,0.75f,true){
-    	private static final long serialVersionUID = 1L;
+    // Thread-safe map for users
+    public static final Map<Integer, User> userMap = Collections.synchronizedMap(new LinkedHashMap<>(5, 0.75f, true) {
+        private static final long serialVersionUID = 1L;
 
-		@Override
-        protected boolean removeEldestEntry(Map.Entry<Integer, User> eldest)
-        {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Integer, User> eldest) {
             return size() > MAX_HASHMAP_SIZE;
         }
-    };
+    });
     
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private static final List<Session> sessionsToUpdate = new ArrayList<>();
-    private static final int TIMEOUT_MINUTES = 5; 
+    private static final List<Session> sessionsToUpdate = Collections.synchronizedList(new ArrayList<>());
 
-
-    public static void startScheduler(){
+    public static void startScheduler() {
+        LOGGER.info("Starting session management scheduler");
         scheduler.scheduleAtFixedRate(() -> {
             try {
-            	System.out.println("before delete "+sessionMap);
+                LOGGER.fine("Running scheduled session cleanup");
                 cleanExpiredSessions(TIMEOUT_MINUTES);
-                cleanExpiredSessionsFromDB(TIMEOUT_MINUTES);
                 updateSessionsInDB();
-//                sessionMap.clear();
-                userMap.clear();
-                System.out.println("after delete "+sessionMap);
+                cleanExpiredSessionsFromDB(TIMEOUT_MINUTES);
+                
+                synchronized (userMap) {
+                    userMap.clear();
+                }
+                
+//                LOGGER.fine("Session cleanup completed");
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Error during scheduled session cleanup", e);
             }
-        }, 5, 30, TimeUnit.SECONDS);
+        }, TIMEOUT_MINUTES, TIMEOUT_MINUTES, TimeUnit.MINUTES);
     }
 
-    // Get the session based on sessionId from the map
     public static Session getSession(String sessionId) {
-        Session result =  sessionMap.get(sessionId);
-        if(result == null) {
-        	result = SessionDao.getSession(sessionId);
-        	if(result != null) sessionMap.put(sessionId, result);
-        	
+        LOGGER.fine("Retrieving session: " + sessionId);
+        Session result = sessionMap.get(sessionId);
+        if (result == null) {
+            result = SessionDao.getSession(sessionId);
+            if (result != null) {
+                LOGGER.info("Session retrieved from database: " + sessionId);
+                sessionMap.put(sessionId, result);
+            }
         }
         return result;
     }
 
-    // Add or update the session in the sessionMap and database
     public static void updateSession(String sessionId, int userId) {
+        LOGGER.fine("Updating session: " + sessionId + " for user: " + userId);
         Session session = sessionMap.get(sessionId);
 
         if (session != null) {
-            // If session exists, update lastAccessedTime
+            // Update last accessed time
             session.setLastAccessedTime(System.currentTimeMillis());
         } else {
-            // If session does not exist, create a new one
+            // Create new session
             session = new Session(userId);
-            sessionMap.put(sessionId, session); // Add new session to the map
+            sessionMap.put(sessionId, session);
+//            LOGGER.info("New session created: " + sessionId);
         }
 
         // Add to list for DB update
         sessionsToUpdate.add(session);
     }
 
-    
     public static void addSession(Session session) {
-    	int userId = session.getUserId();
+        int userId = session.getUserId();
+//        LOGGER.info("Adding session for user: " + userId);
         sessionMap.put(session.getSessionId(), session);
-        userMap.putIfAbsent(userId,userDao.getUserById(userId));
+        userMap.putIfAbsent(userId, userDao.getUserById(userId));
     }
 
-    
     public static void removeSession(String sessionId) {
-    	int userId = sessionMap.get(sessionId).getUserId();
-        sessionMap.remove(sessionId);
-        userMap.remove(userId);
-        System.out.println(userId+" removed");
+        Session session = sessionMap.get(sessionId);
+        if (session != null) {
+            int userId = session.getUserId();
+            sessionMap.remove(sessionId);
+            userMap.remove(userId);
+//            LOGGER.info("Session removed for user: " + userId + ", session: " + sessionId);
+        }
     }
 
-    // Clean up sessions that have been inactive for more than 30 minutes
-    public static void cleanExpiredSessions(int TIMEOUT_MINUTES) {
+    public static void cleanExpiredSessions(int timeoutMinutes) {
         long now = System.currentTimeMillis();
+//        LOGGER.fine("Cleaning expired sessions");
 
-        sessionMap.forEach((sessionId, session) -> {
-            if (session.getLastAccessedTime()+(TIMEOUT_MINUTES*60000)<now) {
-            	System.out.println(sessionId+" removed");
-                sessionMap.remove(sessionId); // Remove from session map
-                try {
-                    SessionDao.deleteSessionById(sessionId); // Clean from DB
-                } catch (Exception e) {
-                    e.printStackTrace();
+        synchronized (sessionMap) {
+            Iterator<Map.Entry<String, Session>> iterator = sessionMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, Session> entry = iterator.next();
+                Session session = entry.getValue();
+                
+                if (session.getLastAccessedTime() + (timeoutMinutes * 60000L) < now) {
+                    String sessionId = entry.getKey();
+                    LOGGER.info("Removing expired session: " + sessionId);
+                    iterator.remove();
+                    
+                    try {
+                        SessionDao.deleteSessionById(sessionId);
+                    } catch (Exception e) {
+                        LOGGER.log(Level.WARNING, "Error deleting expired session from DB", e);
+                    }
                 }
             }
-        });
-    }
-    public static void cleanExpiredSessionsFromDB(int TIMEOUT_MINUTES) throws SQLException {
-        long now = System.currentTimeMillis();
-        SessionDao.deleteExpiredSessions(now - TIMEOUT_MINUTES*60000 );
+        }
     }
 
-    // Batch update sessions in the database
+    public static void cleanExpiredSessionsFromDB(int timeoutMinutes) throws SQLException {
+        long expirationTime = System.currentTimeMillis() - (timeoutMinutes * 60000L);
+//        LOGGER.fine("Cleaning expired sessions from database");
+        SessionDao.deleteExpiredSessions(expirationTime);
+    }
+
     private static void updateSessionsInDB() {
         if (!sessionsToUpdate.isEmpty()) {
             try {
+//                LOGGER.info("Batch updating " + sessionsToUpdate.size() + " sessions");
                 SessionDao.batchUpdateSessions(new ArrayList<>(sessionsToUpdate));
-                for(Session s : sessionsToUpdate) sessionMap.remove(s.getSessionId());
-                sessionsToUpdate.clear(); 
+                
+                // Remove processed sessions from map
+                synchronized (sessionMap) {
+                    sessionsToUpdate.forEach(session -> sessionMap.remove(session.getSessionId()));
+                }
+                
+                sessionsToUpdate.clear();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Error batch updating sessions", e);
             }
         }
     }
 
     public static void initialize() {
-        // Initialize session-related resources here
-        System.out.println("SessionManager initialized");
+        LOGGER.info("SessionManager initialized");
     }
 
     public static void shutdown() {
-        // Clean up resources here
-        scheduler.shutdown(); // stop the scheduler
-        System.out.println("SessionManager shutdown complete");
+        LOGGER.info("Shutting down SessionManager");
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(1, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+        LOGGER.info("SessionManager shutdown complete");
     }
 
-	public static User getUser(int userId) {
-		return userMap.get(userId);
-	}
+    public static User getUser(int userId) {
+        return userMap.get(userId);
+    }
 }

@@ -12,7 +12,8 @@ public enum MyContactsDataColumn implements Column {
     ADDRESS("address"),
     IS_ARCHIVED("isArchived"),
     IS_FAVORITE("isFavorite"),
-    CREATED_AT("created_at");
+	CREATED_AT("createdAt"),
+	MODIFIED_AT("modifiedAt");
 
     private final String columnName;
 

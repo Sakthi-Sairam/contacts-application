@@ -5,7 +5,7 @@
 <%@ page import="com.Dao.CategoriesDao" %>
 <%@ page import="java.util.*" %>
 <%@ page import="com.filters.SessionFilter" %>
-<!DOCTYPE html>
+<!DOCTYPE html>	
 <html>
 <head>
     <meta charset="UTF-8">
@@ -29,7 +29,6 @@
         
         <%
                 User user = (User)SessionFilter.getCurrentUser();
-
 
 				List<CategoryDetails> categories = CategoriesDao.getCategoriesByUserId(user.getUserId());
 				List<Contact> contacts = user.getMyContacts();

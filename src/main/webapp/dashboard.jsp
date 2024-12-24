@@ -81,11 +81,11 @@
                 out.println("<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#editModal" + i.getMyContactsID() + "'><i class=\"bi bi-pencil-square\"></i></button>");
                 out.println("</td>");
                 out.println("</tr>");
-
             }
         } else {
             out.println("<tr><td colspan='4'>No contacts found.</td></tr>");
         }
+        
         %>
         
      	</tbody>

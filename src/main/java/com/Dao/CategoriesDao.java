@@ -18,10 +18,11 @@ public class CategoriesDao {
     public static boolean createCategory(int userId, String categoryName) throws SQLException {
         QueryExecutor executor = new QueryExecutor();
         QueryBuilder qb = new QueryBuilder();
+		long currTime = System.currentTimeMillis();
 
         qb.insert(Table.CATEGORY_DETAILS)
-          .columns(CategoryDetailsColumn.CATEGORY_NAME, CategoryDetailsColumn.USER_ID)
-          .values(categoryName, userId);
+          .columns(CategoryDetailsColumn.CATEGORY_NAME, CategoryDetailsColumn.USER_ID, CategoryDetailsColumn.CREATED_AT,CategoryDetailsColumn.MODIFIED_AT)
+          .values(categoryName, userId, currTime, currTime);
 
         int rowCount = executor.executeUpdate(qb);
         return rowCount > 0;
@@ -48,7 +49,7 @@ public class CategoriesDao {
         QueryBuilder qb = new QueryBuilder();
         QueryExecutor executor = new QueryExecutor();
 
-        qb.select(CategoryDetailsColumn.CATEGORY_ID, CategoryDetailsColumn.CATEGORY_NAME)
+        qb.select(CategoryDetailsColumn.CATEGORY_ID, CategoryDetailsColumn.CATEGORY_NAME, CategoryDetailsColumn.CREATED_AT, CategoryDetailsColumn.MODIFIED_AT)
           .from(Table.CATEGORY_DETAILS)
           .where(CategoryDetailsColumn.USER_ID, "=", userId, true);
 
@@ -67,10 +68,11 @@ public class CategoriesDao {
     public static boolean addContactToCategory(int categoryId, int contactId) throws SQLException {
         QueryBuilder qb = new QueryBuilder();
         QueryExecutor executor = new QueryExecutor();
+		long currTime = System.currentTimeMillis();
 
         qb.insert(Table.CATEGORY_LIST)
-          .columns(CategoryListColumn.CATEGORY_ID, CategoryListColumn.MY_CONTACTS_ID)
-          .values(categoryId, contactId);
+          .columns(CategoryListColumn.CATEGORY_ID, CategoryListColumn.MY_CONTACTS_ID, CategoryListColumn.CREATED_AT, CategoryListColumn.MODIFIED_AT)
+          .values(categoryId, contactId, currTime, currTime);
 
         int rowCount = executor.executeUpdate(qb);
         return rowCount > 0;
@@ -160,7 +162,7 @@ public class CategoriesDao {
 
         qb.select(MyContactsDataColumn.MY_CONTACTS_ID, MyContactsDataColumn.ALIAS_FND_NAME,
         		MyContactsDataColumn.FRIEND_EMAIL, MyContactsDataColumn.PHONE,
-        		MyContactsDataColumn.ADDRESS, MyContactsDataColumn.IS_ARCHIVED, MyContactsDataColumn.IS_FAVORITE)
+        		MyContactsDataColumn.ADDRESS, MyContactsDataColumn.IS_ARCHIVED, MyContactsDataColumn.IS_FAVORITE, MyContactsDataColumn.CREATED_AT, MyContactsDataColumn.MODIFIED_AT)
           .from(Table.MY_CONTACTS_DATA)
           .join(Table.CATEGORY_LIST, CategoryListColumn.MY_CONTACTS_ID,
         		  MyContactsDataColumn.MY_CONTACTS_ID)

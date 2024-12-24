@@ -9,7 +9,9 @@ public enum Table {
     MAIL_MAPPER("MailMapper"),
     MY_CONTACTS_DATA("MyContactsData"),
     SESSIONS("sessions"),
-    USER_DATA("userdata");
+    USER_DATA("userdata"),
+	SERVER_REGISTRY("server_registry"),
+	AUDIT_LOG("audit_log");
 
     private final String tableName;
 

@@ -6,7 +6,9 @@ package com.QueryLayer.DatabaseSchemaEnums;
 public enum CategoryDetailsColumn implements Column {
     CATEGORY_ID("categoryId"),
     CATEGORY_NAME("categoryName"),
-    USER_ID("user_id");
+    USER_ID("user_id"),
+	CREATED_AT("createdAt"),
+	MODIFIED_AT("modifiedAt");
 
     private final String columnName;
 

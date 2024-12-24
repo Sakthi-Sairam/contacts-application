@@ -4,27 +4,40 @@ import java.util.*;
 import com.models.Column;
 
 public class CategoryDetails {
-    @Column(name = "categoryId")
+    @Column(name = "CategoryDetails.categoryId")
     private int categoryId;
 
-    @Column(name = "categoryName")
+    @Column(name = "CategoryDetails.categoryName")
     private String categoryName;
+    
+	@Column(name ="CategoryDetails.createdAt")
+    private long createdAt;
+	
+	@Column(name ="CategoryDetails.modifiedAt")
+    private long modifiedAt;
 
-    private List<Contact> categoryContacts;
 
-    // Default constructor
+	private List<Contact> categoryContacts;
+
     public CategoryDetails() {
         this.categoryContacts = new ArrayList<>();
     }
 
-    // Parameterized constructor
     public CategoryDetails(int categoryId, String categoryName) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.categoryContacts = new ArrayList<>();
     }
+    
+    public CategoryDetails(int categoryId, String categoryName, long createdAt, long modifiedAt) {
+        this.categoryContacts = new ArrayList<>();
+		this.categoryId = categoryId;
+		this.categoryName = categoryName;
+		this.createdAt = createdAt;
+		this.modifiedAt = modifiedAt;
+	}
 
-    public String getCategoryName() {
+	public String getCategoryName() {
         return categoryName;
     }
 
@@ -47,4 +60,20 @@ public class CategoryDetails {
     public void setCategoryContacts(List<Contact> categoryContacts) {
         this.categoryContacts = categoryContacts;
     }
+    
+    public long getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(long createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public long getModifiedAt() {
+		return modifiedAt;
+	}
+
+	public void setModifiedAt(long modifiedAt) {
+		this.modifiedAt = modifiedAt;
+	}
 }

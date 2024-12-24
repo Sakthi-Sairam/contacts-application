@@ -25,6 +25,12 @@ public class Session {
 		this.createdAt = createdAt;
 	}
 
+	@Override
+	public String toString() {
+		return "Session [sessionId=" + sessionId + ", userId=" + userId + ", lastAccessedTime=" + lastAccessedTime
+				+ ", createdAt=" + createdAt + "]";
+	}
+
 	public String getSessionId() { return sessionId; }
     public void setSessionId(String sessionId) { this.sessionId = sessionId; }
 

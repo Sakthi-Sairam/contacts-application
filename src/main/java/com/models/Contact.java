@@ -1,20 +1,27 @@
 package com.models;
 
 public class Contact {
-	@Column(name = "MyContactsID")
+	@Column(name = "MyContactsData.MyContactsID")
 	private int MyContactsID;
-	@Column(name = "alias_fnd_name")
+	@Column(name = "MyContactsData.alias_fnd_name")
 	private String alias_name;
-	@Column(name = "friend_email")
+	@Column(name = "MyContactsData.friend_email")
 	private String friend_email;
-	@Column(name = "phone")
+	@Column(name = "MyContactsData.phone")
 	private String phone;
-	@Column(name = "address")
+	@Column(name = "MyContactsData.address")
 	private String address;
-	@Column(name = "isArchived")
+	@Column(name = "MyContactsData.isArchived")
 	private int isArchived;
-	@Column(name = "isFavorite")
+	@Column(name = "MyContactsData.isFavorite")
 	private int isFavorite;
+	
+	@Column(name ="MyContactsData.createdAt")
+    private long createdAt;
+	
+	@Column(name ="MyContactsData.modifiedAt")
+    private long modifiedAt;
+	
 	public Contact() {}
 	public Contact(int MyContactsID, String alias_name, String friend_email, String phone, String address, int isArchived, int isFavorite) {
 		this.MyContactsID = MyContactsID;
@@ -24,6 +31,17 @@ public class Contact {
 		this.address = address;
 		this.isArchived = isArchived;
 		this.isFavorite = isFavorite;
+	}
+	public Contact(int myContactsID, String alias_name, String friend_email, String phone, String address, int isArchived, int isFavorite, long createdAt, long modifiedAt) {
+		MyContactsID = myContactsID;
+		this.alias_name = alias_name;
+		this.friend_email = friend_email;
+		this.phone = phone;
+		this.address = address;
+		this.isArchived = isArchived;
+		this.isFavorite = isFavorite;
+		this.createdAt = createdAt;
+		this.modifiedAt = modifiedAt;
 	}
 	public int getMyContactsID() {
 		return MyContactsID;
@@ -66,6 +84,18 @@ public class Contact {
 	}
 	public void setIsFavorite(int isFavorite) {
 		this.isFavorite = isFavorite;
+	}
+	public long getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(long createdAt) {
+		this.createdAt = createdAt;
+	}
+	public long getModifiedAt() {
+		return modifiedAt;
+	}
+	public void setModifiedAt(long modifiedAt) {
+		this.modifiedAt = modifiedAt;
 	}
 	
 	

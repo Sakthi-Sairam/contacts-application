@@ -39,7 +39,7 @@ public class AddUserEmail extends HttpServlet {
         }
         
         if (isAdded) {
-            response.sendRedirect(request.getContextPath() + "/profile.jsp");
+            response.sendRedirect(request.getContextPath() + "/viewcontacts");
         } else {
 //            request.setAttribute("result", "Email might already be in use.");
 //            request.getRequestDispatcher("/profile.jsp").forward(request, response);

@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.Dao.userDao;
@@ -16,84 +16,146 @@ import com.managers.SessionManager;
 import com.models.Session;
 import com.models.User;
 
-@WebFilter("*")
+@WebFilter(urlPatterns = {"/*"}, filterName = "SessionFilter")
 public class SessionFilter implements Filter {
     private static final ThreadLocal<User> threadLocalSession = new ThreadLocal<>();
-    private static final int TIMEOUT_MINUTES = 5; 
+    private static final Logger ACCESS_LOGGER = LoggerManager.getAccessLogger();
+    private static final Logger LOGGER = Logger.getLogger(SessionFilter.class.getName());
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-    	
-    	final Logger accessLogger = LoggerManager.getAccessLogger();
-    	
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) 
+            throws IOException, ServletException {
+        
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         
-//        System.out.println(SessionManager.sessionMap);
         String requestURI = httpRequest.getRequestURI();
         
+        LOGGER.fine("Processing request: " + requestURI);
 
-        // Allow unauthenticated access to login and registration pages
-        if (requestURI.endsWith("login.jsp") || requestURI.endsWith("register.jsp") || requestURI.endsWith("login") || requestURI.endsWith("register")) {
-            String sessionId = getSessionIdFromCookies(httpRequest.getCookies());
-            if (sessionId != null && SessionManager.getSession(sessionId) != null) {
-                httpResponse.sendRedirect("dashboard.jsp");
-                return;
-            }
-        	System.out.println("new request.............");
+        // Path to exclude
+        if (requestURI.endsWith("invalidatecache")) {
+            LOGGER.info("Skipping session validation for: " + requestURI);
             chain.doFilter(request, response);
             return;
         }
 
-        // Extract session ID from cookies
+        if (isLoginOrRegistrationPage(requestURI)) {
+            handleLoginPage(httpRequest, httpResponse, chain);
+            return;
+        }
+
+        // Extract and validate session
         String sessionId = getSessionIdFromCookies(httpRequest.getCookies());
         if (sessionId == null) {
-            System.out.println("Session ID not found");
+            LOGGER.warning("No session ID found, redirecting to login");
             httpResponse.sendRedirect("login.jsp");
             return;
         }
-        // Log access details
-        accessLogger.info("Accessed URI: " + requestURI + " | Session ID: " + sessionId + " | Time: " + System.currentTimeMillis());
 
+        // Log access details
+        logAccessDetails(requestURI, sessionId);
+
+        // Validate session
+        if (!validateAndProcessSession(httpRequest, httpResponse, sessionId)) {
+            return;
+        }
+
+        try {
+            request.setAttribute("sessionId", sessionId);
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            ACCESS_LOGGER.log(Level.SEVERE, "Error processing request", e);
+            httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Request processing error");
+        } finally {
+            threadLocalSession.remove();
+        }
+    }
+
+    // Clear all session-related cookies
+    private void clearSessionAndCookies(HttpServletResponse response) {
+        Cookie sessionCookie = new Cookie("s-id", "");
+        sessionCookie.setMaxAge(0);
+        sessionCookie.setPath("/");
+        response.addCookie(sessionCookie);
+    }
+
+    private boolean isLoginOrRegistrationPage(String requestURI) {
+        return requestURI.endsWith("login.jsp") || 
+               requestURI.endsWith("register.jsp") || 
+               requestURI.endsWith("login") || 
+               requestURI.endsWith("register");
+    }
+
+    private void handleLoginPage(HttpServletRequest httpRequest, HttpServletResponse httpResponse, 
+                                  FilterChain chain) 
+            throws IOException, ServletException {
+        String sessionId = getSessionIdFromCookies(httpRequest.getCookies());
+        
+        // Check if session exists and is valid
+        if (sessionId != null) {
+            Session session = SessionManager.getSession(sessionId);
+            
+            // Validate session time
+            if (session != null) {
+                long now = System.currentTimeMillis();
+                if (session.getLastAccessedTime() + SessionManager.TIMEOUT_MINUTES * 60000L >= now) {
+                    LOGGER.info("Active session found, redirecting to dashboard");
+                    httpResponse.sendRedirect("dashboard.jsp");
+                    return;
+                }
+            }
+        }
+        
+        chain.doFilter(httpRequest, httpResponse);
+    }
+
+    private boolean validateAndProcessSession(HttpServletRequest httpRequest, HttpServletResponse httpResponse, 
+                                              String sessionId) 
+            throws IOException {
         // Retrieve session from the SessionManager
         Session storedSession = SessionManager.getSession(sessionId);
 
-        if (storedSession == null) { //session is not present in the map and db
-            System.out.println("No session found for ID: " + sessionId);
+        if (storedSession == null) {
+            LOGGER.warning("No session found for ID: " + sessionId);
             httpResponse.sendRedirect("login.jsp");
-            return;
+            return false;
         }
 
         long lastAccessedTime = storedSession.getLastAccessedTime();
         long now = System.currentTimeMillis();
+        long timeoutMillis = SessionManager.TIMEOUT_MINUTES * 60000L;
 
-
-        if (lastAccessedTime + TIMEOUT_MINUTES * 60000 < now) {
-            // Remove from session map if timed out
+        // Check session timeout
+        if (lastAccessedTime + timeoutMillis < now) {
+            LOGGER.info("Session expired for ID: " + sessionId);
+            
+            // Remove session from manager and clear cookie
             SessionManager.removeSession(sessionId);
+            clearSessionAndCookies(httpResponse);
+            
             httpResponse.sendRedirect("login.jsp");
-            return;
-        } else {
-        	
-        	int userId = storedSession.getUserId();
-            SessionManager.updateSession(sessionId, storedSession.getUserId());
-//            int userId = SessionManager.sessionMap.get(sessionId).getUserId();
-            if(!SessionManager.userMap.containsKey(userId)) {
-            	SessionManager.userMap.put(userId,userDao.getUserById(userId));
-            }
+            return false;
         }
 
-
-        threadLocalSession.set(SessionManager.getUser(storedSession.getUserId()));
-
-        try {
-        	request.setAttribute("sessionId",sessionId);
-            chain.doFilter(request, response);
-        }catch(Exception e) {
-        	accessLogger.severe("Error processing request: " + e.getMessage());
-        } finally {
-            threadLocalSession.remove();
+        // Update session and user cache
+        int userId = storedSession.getUserId();
+        SessionManager.updateSession(sessionId, userId);
+        
+        if (!SessionManager.userMap.containsKey(userId)) {
+            User user = userDao.getUserById(userId);
+            SessionManager.userMap.put(userId, user);
         }
+
+        threadLocalSession.set(SessionManager.getUser(userId));
+        return true;
+    }
+
+    private void logAccessDetails(String requestURI, String sessionId) {
+        ACCESS_LOGGER.info(String.format(
+            "Accessed URI: %s | Session ID: %s | Time: %d", 
+            requestURI, sessionId, System.currentTimeMillis()
+        ));
     }
 
     public static String getSessionIdFromCookies(Cookie[] cookies) {
@@ -104,19 +166,15 @@ public class SessionFilter implements Filter {
                 }
             }
         }
-        return null; // Session ID not found
+        return null;
     }
 
+    @Override
     public void destroy() {
         threadLocalSession.remove();
     }
 
     public static User getCurrentUser() {
-//    	System.out.println("in filter : "+threadLocalSession.get());
-    	User currentUser = threadLocalSession.get();
-//    	if(currentUser == null) {
-//            sid = getSessionIdFromCookies();
-//    		SessionManager.userMap.put(SessionManager.sessionMap.get(), currentUser);}
-        return currentUser;
+        return threadLocalSession.get();
     }
 }

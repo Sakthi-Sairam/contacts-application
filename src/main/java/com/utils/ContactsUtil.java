@@ -17,13 +17,13 @@ public class ContactsUtil {
 	    	  List<Contact> favourites = getFavourites(contacts);
 	    	  List<Contact> archieves = getArchieves(contacts);
 	    	  
-	    	  List<Email> emails = userDao.getEmailsByUserId(user.getUserId());
+//	    	  List<Email> emails = userDao.getEmailsByUserId(user.getUserId());
 	    	  
 	    	  user.setMyContacts(contacts); 
 	    	  user.setFavourites(favourites);
 	    	  user.setArchieves(archieves);
 	    	  
-	    	  user.setEmails(emails);
+//	    	  user.setEmails(emails);
 	    	  user.setPrimaryEmailId(user.findPrimaryEmail());     	  
 	    	  
 	      } catch (SQLException e) {

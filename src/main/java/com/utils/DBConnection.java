@@ -39,7 +39,6 @@ public class DBConnection {
     private static final String DB_USER = "root";
     private static final String DB_PASS = null;
 
-    // Create a BasicDataSource instance
     private static BasicDataSource dataSource = new BasicDataSource();
 
     static {
@@ -51,7 +50,6 @@ public class DBConnection {
         dataSource.setMaxTotal(25);
     }
 
-    // Method to get a connection from the pool
     public static Connection getConnection()  {
         try {
 			return dataSource.getConnection();

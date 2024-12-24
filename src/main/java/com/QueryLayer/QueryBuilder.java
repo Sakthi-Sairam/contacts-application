@@ -104,6 +104,27 @@ public class QueryBuilder {
         query.setQueryString(deleteQuery);
         return this;
     }
+    
+ // for update statements
+    public QueryBuilder update(Table table) {
+        query.setQueryType(QueryType.UPDATE);
+        String updateQuery = "UPDATE " + table.getTableName();
+        query.setQueryString(updateQuery);
+        return this;
+    }
+
+    public QueryBuilder set(Column column, Object value) {
+        String queryString = query.getQueryString();
+        if (!queryString.contains(" SET ")) {
+            queryString += " SET ";
+        } else {
+            queryString += ", ";
+        }
+        queryString += column.toString() + " = " + formatValue(value);
+        query.setQueryString(queryString);
+        return this;
+    }
+
 
     // returning the value
     public String build() {
@@ -122,4 +143,12 @@ public class QueryBuilder {
             return value.toString();
         }
     }
+
+	public QueryBuilder orderBy(MyContactsDataColumn aliasFndName, boolean isAscending) {
+		String queryString = query.getQueryString();
+		queryString += " ORDER BY "+aliasFndName;
+		if(!isAscending) queryString += " Desc";
+		query.setQueryString(queryString);
+		return this;
+	}
 }

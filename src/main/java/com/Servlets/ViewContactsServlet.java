@@ -40,6 +40,7 @@ public class ViewContactsServlet extends HttpServlet {
         User user = (User) SessionFilter.getCurrentUser();
 
       try {
+    	  System.out.print("coming to viewcontacts");
     	  List<Contact> contacts = ContactDao.getContactsByUserId(user.getUserId());
     	  List<Contact> favourites = getFavourites(contacts);
     	  List<Contact> archieves = getArchieves(contacts);

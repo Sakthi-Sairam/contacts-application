@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import com.Dao.ContactDao;
 import com.models.Contact;
 
-@WebServlet("/editContact")
+//@WebServlet("/editContact")
 public class EditContactServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

@@ -3,12 +3,29 @@ package com.models;
 import java.util.*;
 
 public class User {
+	@Column(name = "userdata.user_id")
 	private int userId;
+	@Column(name = "userdata.first_name")
 	private String firstName;
+	@Column(name = "userdata.last_name")
 	private String lastName;
+	@Column(name = "userdata.age")
 	private int age;
+	@Column(name = "userdata.address")
 	private String address;
+	@Column(name = "userdata.phone")
 	private String phone;
+	
+	@Column(name = "userdata.password")
+	private String password;
+	
+	@Column(name ="userdata.createdAt")
+    private long createdAt;
+	
+	@Column(name ="userdata.modifiedAt")
+    private long modifiedAt;
+
+
 	private Integer primaryEmailId = null;
 	
 	List<Contact> myContacts;
@@ -36,6 +53,16 @@ public class User {
 		
 	}
 
+	public User(int userId, String firstName, String lastName, int age, String address, String phone, long createdAt, long modifiedAt) {
+		this.userId = userId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.age = age;
+		this.address = address;
+		this.phone = phone;
+		this.createdAt = createdAt;
+		this.modifiedAt = modifiedAt;
+	}
 	public int getUserId() {
 		return userId;
 	}
@@ -135,6 +162,34 @@ public class User {
 	public void setPrimaryEmailId(int primaryEmailId) {
 		this.primaryEmailId = primaryEmailId;
 	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	public long getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(long createdAt) {
+		this.createdAt = createdAt;
+	}
+	public long getModifiedAt() {
+		return modifiedAt;
+	}
+	public void setModifiedAt(long modifiedAt) {
+		this.modifiedAt = modifiedAt;
+	}
+	@Override
+	public String toString() {
+		return "User [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", age=" + age
+				+ ", address=" + address + ", phone=" + phone + ", password=" + password + ", primaryEmailId="
+				+ primaryEmailId + ", myContacts=" + myContacts + ", favourites=" + favourites + ", archieves="
+				+ archieves + ", emails=" + emails + "]";
+	}
+	
+	
 
 	
 }
