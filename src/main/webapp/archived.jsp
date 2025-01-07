@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
     
 <%@ page import="com.models.User" %>
+<%@page import="com.Dao.ContactDao"%>
 <%@ page import="com.models.Contact" %>
 <%@ page import="com.filters.SessionFilter" %>
 <%@ page import="java.util.*" %>
@@ -48,7 +49,7 @@
     <tbody>
 	<h3 class="heading">Archieved Contacts</h3>
 	    <%
-        List<Contact> contacts = user.getArchieves();
+        List<Contact> contacts = ContactDao.getArchivedContactsByUserId(user.getUserId());
         if (contacts != null && !contacts.isEmpty()) {
             for (Contact i : contacts) {
                 out.println("<tr>");

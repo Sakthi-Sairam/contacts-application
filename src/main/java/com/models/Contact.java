@@ -98,5 +98,12 @@ public class Contact {
 		this.modifiedAt = modifiedAt;
 	}
 	
+	@Override
+	public String toString() {
+		return "Contact [MyContactsID=" + MyContactsID + ", alias_name=" + alias_name + ", friend_email=" + friend_email
+				+ ", phone=" + phone + ", address=" + address + ", isArchived=" + isArchived + ", isFavorite="
+				+ isFavorite + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
+	}
+	
 	
 }

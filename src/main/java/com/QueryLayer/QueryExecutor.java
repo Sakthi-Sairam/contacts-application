@@ -3,111 +3,85 @@ package com.QueryLayer;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.sql.*;
-
+import java.util.*;
 import com.models.Column;
 import com.utils.DBConnection;
-
-import java.util.*;
-
+import com.exceptions.QueryExecutorException;
+import com.exceptions.ErrorCode;
 
 public class QueryExecutor {
     private Connection connection;
     private boolean isTransaction = false;
-    
+
     /**
      * Establishes and returns a database connection.
-     * @return Connection object representing the database connection
-     * @throws RuntimeException if connection fails
+     * Throws QueryExecutorException if connection fails.
      */
-    private Connection getConnection() {
-    	connection = DBConnection.getConnection();
-        return connection;
+    private Connection getConnection() throws QueryExecutorException {
+        try {
+            connection = DBConnection.getConnection();
+            return connection;
+        } catch (QueryExecutorException e) {
+            throw new QueryExecutorException(ErrorCode.DATABASE_CONNECTION_ERROR, "Failed to establish database connection", e);
+        }
     }
 
     /**
      * Starts a new database transaction.
-     * @throws SQLException if transaction initialization fails
+     * Throws QueryExecutorException if transaction initialization fails.
      */
-    public void transactionStart() throws SQLException {
+    public void transactionStart() throws QueryExecutorException {
         if (isTransaction) {
-            throw new SQLException("Transaction already in progress");
+            throw new QueryExecutorException(ErrorCode.TRANSACTION_ERROR, "A transaction is already active.");
         }
         this.connection = getConnection();
         this.isTransaction = true;
-        this.connection.setAutoCommit(false);
+        try {
+            this.connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new QueryExecutorException(ErrorCode.TRANSACTION_ERROR, "Failed to start transaction", e);
+        }
     }
-
+    
     /**
      * Commits and ends the current transaction.
-     * @throws SQLException if commit fails or connection cannot be closed
+     * @throws QueryExecutorException if commit fails or connection cannot be closed
      */
-    public void transactionEnd() throws SQLException {
+    public void transactionEnd() throws QueryExecutorException {
         if (!isTransaction) {
-            throw new SQLException("No active transaction to end");
+            throw new QueryExecutorException(ErrorCode.TRANSACTION_ERROR, "No active transaction to end.");
         }
         try {
             connection.commit();
             isTransaction = false;
+        } catch (SQLException e) {
+            throw new QueryExecutorException(ErrorCode.TRANSACTION_ERROR, "Failed to commit transaction", e);
         } finally {
             closeConnection();
         }
     }
-
-    /**
-     * Executes a SELECT query and returns the results.
-     * @param query QueryBuilder object containing the query to execute
-     * @return List of Objects array containing the query results
-     * @throws SQLException if query execution fails
-     */
-    public List<Object[]> executeQuery(QueryBuilder query) throws SQLException {
-        List<Object[]> results = new ArrayList<>();
-        String sql = query.build();
-        System.out.println(sql);
-        int numberOfCols = query.getNumberOfCols();
-
-        if (!isTransaction) {
-            connection = getConnection();
-        }
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-
-            while (resultSet.next()) {
-                Object tempArr[] = new Object[numberOfCols];
-                for (int i = 1; i <= numberOfCols; i++) {
-                    tempArr[i-1] = resultSet.getObject(i);
-                }
-                results.add(tempArr);
-            }
-            System.out.println(results);
-            return results;
-        } finally {
-            if (!isTransaction) {
-                closeConnection();
-            }
-        }
-    }
-
+    
     /**
      * Executes an INSERT, UPDATE, or DELETE query.
      * @param sql QueryBuilder object containing the query to execute
      * @return number of rows affected by the query
-     * @throws SQLException if query execution fails
+     * @throws QueryExecutorException if query execution fails
      */
-    public int executeUpdate(QueryBuilder sql) throws SQLException {
+    public int executeUpdate(QueryBuilder query) throws QueryExecutorException {
+        String sql = query.build();
         if (!isTransaction) {
             connection = getConnection();
         }
-        System.out.println(sql.build());
 
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql.build())) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             return preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            if (isTransaction) {
+            try {
                 connection.rollback();
+            } catch (SQLException rollbackEx) {
+                throw new QueryExecutorException(ErrorCode.DATABASE_ERROR, "Rollback failed",rollbackEx);
             }
-            throw e;
+        	throw new QueryExecutorException(ErrorCode.QUERY_EXECUTION_FAILED, "Error executing update query: " + sql, e);
         } finally {
             if (!isTransaction) {
                 closeConnection();
@@ -115,34 +89,29 @@ public class QueryExecutor {
         }
     }
 
-    /**
-     * Executes an INSERT query and returns the generated keys.
-     * @param sql QueryBuilder object containing the INSERT query
-     * @return Pair containing row count and generated key (-1 if no key generated)
-     * @throws SQLException if query execution fails
-     */
-    public Pair executeUpdateWithGeneratedKeys(QueryBuilder sql) throws SQLException {
+    public Pair executeUpdateWithGeneratedKeys(QueryBuilder sql) throws QueryExecutorException {
         if (!isTransaction) {
             connection = getConnection();
         }
 
-        try (PreparedStatement preparedStatement =
-                     connection.prepareStatement(sql.build(), Statement.RETURN_GENERATED_KEYS)) {
-
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql.build(), Statement.RETURN_GENERATED_KEYS)) {
             int rowCount = preparedStatement.executeUpdate();
 
             try (ResultSet rs = preparedStatement.getGeneratedKeys()) {
                 if (rs.next()) {
-                    return new
-                            Pair(rowCount, rs.getInt(1));
+                    return new Pair(rowCount, rs.getInt(1));
                 }
-                return new Pair(rowCount, -1); // No keys generated
+                return new Pair(rowCount, -1);
             }
         } catch (SQLException e) {
             if (isTransaction) {
-                connection.rollback();
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    throw new QueryExecutorException(ErrorCode.DATABASE_ERROR, "Rollback error",rollbackEx);
+                }
             }
-            throw e;
+            throw new QueryExecutorException(ErrorCode.QUERY_EXECUTION_FAILED,"Error executing the query" ,e);
         } finally {
             if (!isTransaction) {
                 closeConnection();
@@ -150,31 +119,27 @@ public class QueryExecutor {
         }
     }
 
-    /**
-     * Executes multiple queries in a transaction.
-     * @param sqlQueries List of QueryBuilder objects containing the queries
-     * @throws SQLException if any query fails
-     */
-    public void executeTransaction(List<QueryBuilder> sqlQueries) throws SQLException {
+    public void executeTransaction(List<QueryBuilder> sqlQueries) throws QueryExecutorException {
         transactionStart();
         try {
             for (QueryBuilder query : sqlQueries) {
                 executeUpdate(query);
             }
             transactionEnd();
-        } catch (SQLException e) {
-            if (connection != null) {
-                connection.rollback();
-            }
-            throw e;
         } finally {
             isTransaction = false;
             closeConnection();
         }
     }
     
-    
-    public <T> List<T> executeQuery(QueryBuilder query, Class<T> clazz) {
+    /**
+     * Executes an Select query and returns the respective model (POJO).
+     * @param query QueryBuilder object containing the INSERT query
+     * @param clazz class of the model
+     * @return model reference
+     * @throws QueryExecutorException if query execution fails
+     */
+    public <T> List<T> executeQuery(QueryBuilder query, Class<T> clazz) throws QueryExecutorException {
         try {
             String sql = query.build();
             System.out.println("Executing SQL: " + sql);
@@ -185,32 +150,34 @@ public class QueryExecutor {
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sql);
                  ResultSet resultSet = preparedStatement.executeQuery()) {
-
-//                ResultSetMetaData rsMetaData = resultSet.getMetaData();
-//                int columnCount = rsMetaData.getColumnCount();
-//
-//                // Debug: Print column names
-//                Set<String> columnNames = new HashSet<>();
-//                for (int i = 1; i <= columnCount; i++) {
-//                    String columnName = rsMetaData.getColumnLabel(i);
-//                    columnNames.add(columnName);
-//                    System.out.println("Column " + i + ": " + columnName);
-//                }
-
-                List<T> results = mapResultSetToClass(resultSet, clazz);
-                return results;
-            } finally {
-                if (!isTransaction) {
-                    closeConnection();
-                }
+                return mapResultSetToClass(resultSet, clazz);
             }
         } catch (Exception e) {
-            System.err.println("Error executing query: " + e.getMessage());
-            e.printStackTrace();
-            return null;
+        	if(isTransaction) {
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    throw new QueryExecutorException(ErrorCode.DATABASE_ERROR, "Rollback failed",rollbackEx);
+                }
+        	}
+        	throw new QueryExecutorException(ErrorCode.QUERY_EXECUTION_FAILED, "Execution failed",e);
+        } finally {
+            if (!isTransaction) {
+                closeConnection();
+            }
         }
     }
 
+    private void closeConnection() throws QueryExecutorException {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+                connection = null;
+            }
+        } catch (SQLException e) {
+            throw new QueryExecutorException(ErrorCode.DATABASE_CONNECTION_ERROR, "Failed to close database connection", e);
+        }
+    }
     /**
      * Maps ResultSet to class instances, handling grouping and nested fields.
      */
@@ -339,7 +306,6 @@ public class QueryExecutor {
                     }
                 }
 
-                // Add to list if populated
                 if (populated) {
                     List<Object> nestedList = (List<Object>) field.get(instance);
                     if (nestedList == null) {
@@ -379,15 +345,6 @@ public class QueryExecutor {
             return UUID.randomUUID().toString();
         }
     }
+    
 
-	/**
-     * Closes the database connection if it exists and is open.
-     * @throws SQLException if connection cannot be closed
-     */
-    public void closeConnection() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-            connection = null;
-        }
-    }
 }

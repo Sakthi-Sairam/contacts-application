@@ -4,7 +4,7 @@ import com.QueryLayer.DatabaseSchemaEnums.*;
 
 public class QueryBuilder {
 
-    private Query query;
+    public Query query;
 
     public QueryBuilder() {
         this.query = new Query();

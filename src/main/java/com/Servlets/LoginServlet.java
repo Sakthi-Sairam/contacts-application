@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import com.Dao.userDao;
+import com.exceptions.DaoException;
 import com.models.User;
 import com.utils.AuthUtil;
 
@@ -44,23 +45,17 @@ public class LoginServlet extends HttpServlet {
 
         User user = null;
         try {
-            // Authenticate user using the provided email and password
-            user = userDao.loginUser(email, password);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (user != null) {
-            try {
-                // Log in the user using the AuthUtil class
-                AuthUtil.loginUser(user, res);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            res.sendRedirect("dashboard.jsp");
-        } else {
-            req.setAttribute("errorMessage", "Invalid email or password.");
-            req.getRequestDispatcher("login.jsp").forward(req, res);
-        }
+			user = userDao.loginUser(email, password);
+	        if(user!=null) {
+	        	AuthUtil.loginUser(user, res);
+	            res.sendRedirect("/contacts");
+	        } else {
+	            req.setAttribute("errorMessage", "Invalid email or password.");
+	            req.getRequestDispatcher("login.jsp").forward(req, res);
+	        }
+        
+        }catch (DaoException e) {
+			e.printStackTrace();
+		}
     }
 }

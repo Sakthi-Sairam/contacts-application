@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import com.Dao.SessionDao;
+import com.exceptions.DaoException;
 import com.filters.SessionFilter;
 import com.managers.SessionManager;
+import com.utils.ErrorHandlerUtil;
 
 //@WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {
@@ -24,9 +26,8 @@ public class LogoutServlet extends HttpServlet {
 		SessionManager.removeSession(sessionId);
 		try {
 			SessionDao.deleteSessionById(sessionId);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (DaoException e) {
+        	ErrorHandlerUtil.handleServerError(response, "Failed to logout", e);
 		}
 		response.sendRedirect("login");
 	}

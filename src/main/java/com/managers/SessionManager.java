@@ -4,6 +4,7 @@ import com.models.Session;
 import com.models.User;
 import com.Dao.SessionDao;
 import com.Dao.userDao;
+import com.exceptions.DaoException;
 
 import java.sql.SQLException;
 import java.time.Instant;
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
 public class SessionManager {
     private static final Logger LOGGER = Logger.getLogger(SessionManager.class.getName());
     
-    public static final int TIMEOUT_MINUTES = 5;
+    public static final int TIMEOUT_MINUTES = 30;
     private static final int MAX_HASHMAP_SIZE = 5;
 
     // Thread-safe synchronized map for sessions
@@ -66,14 +67,19 @@ public class SessionManager {
     public static Session getSession(String sessionId) {
         LOGGER.fine("Retrieving session: " + sessionId);
         Session result = sessionMap.get(sessionId);
-        if (result == null) {
-            result = SessionDao.getSession(sessionId);
-            if (result != null) {
-                LOGGER.info("Session retrieved from database: " + sessionId);
-                sessionMap.put(sessionId, result);
-            }
-        }
-        return result;
+        try {
+			if (result == null) {
+			    result = SessionDao.getSession(sessionId);
+			    if (result != null) {
+			        LOGGER.info("Session retrieved from database: " + sessionId);
+			        sessionMap.put(sessionId, result);
+			    }
+			}
+			return result;
+		} catch (DaoException e) {
+			e.printStackTrace();
+			return null;
+		}
     }
 
     public static void updateSession(String sessionId, int userId) {
@@ -98,7 +104,12 @@ public class SessionManager {
         int userId = session.getUserId();
 //        LOGGER.info("Adding session for user: " + userId);
         sessionMap.put(session.getSessionId(), session);
-        userMap.putIfAbsent(userId, userDao.getUserById(userId));
+        try {
+			userMap.putIfAbsent(userId, userDao.getUserById(userId));
+		} catch (DaoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public static void removeSession(String sessionId) {
@@ -136,7 +147,7 @@ public class SessionManager {
         }
     }
 
-    public static void cleanExpiredSessionsFromDB(int timeoutMinutes) throws SQLException {
+    public static void cleanExpiredSessionsFromDB(int timeoutMinutes) throws DaoException {
         long expirationTime = System.currentTimeMillis() - (timeoutMinutes * 60000L);
 //        LOGGER.fine("Cleaning expired sessions from database");
         SessionDao.deleteExpiredSessions(expirationTime);
@@ -180,5 +191,8 @@ public class SessionManager {
 
     public static User getUser(int userId) {
         return userMap.get(userId);
+    }
+    public static void setUser(User user) {
+    	userMap.put(user.getUserId(), user);
     }
 }

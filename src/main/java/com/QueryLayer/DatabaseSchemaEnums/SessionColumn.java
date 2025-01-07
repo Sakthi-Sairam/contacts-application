@@ -22,6 +22,6 @@ public enum SessionColumn implements Column {
 
     @Override
     public String toString() {
-        return getTable().getTableName() + "." + columnName; // Returns fully qualified name
+        return getTable().getTableName() + "." + columnName;
     }
 }

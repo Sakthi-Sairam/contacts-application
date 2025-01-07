@@ -1,8 +1,10 @@
 package com.Servlets;
 
 import com.Dao.userDao;
+import com.exceptions.DaoException;
 import com.models.User;
 import com.utils.AuthUtil;
+import com.utils.ErrorHandlerUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -50,33 +52,32 @@ public class RegisterServlet extends HttpServlet {
         String phone = request.getParameter("phone");
         boolean registrationSuccessful = false;
 
-        // Hash the password using BCrypt
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-        // Check if email is already registered
-        if (!userDao.mailCheck(email)) {
-            // Register the user
-            registrationSuccessful = userDao.registerUser(hashedPassword, firstName, lastName, age, address, phone, email);
-        }
+        try {
+			if (!userDao.mailCheck(email)) {
+				
+			    registrationSuccessful = userDao.registerUser(hashedPassword, firstName, lastName, age, address, phone, email);
+			}
 
-        if (registrationSuccessful) {
-            // Auto-login the user after successful registration
-            User user = null;
-            try {
-                // Authenticate the user
-                user = userDao.loginUser(email, password);
-                if (user != null) {
-                    // Log in the user using the AuthUtil class
-                    AuthUtil.loginUser(user, response);
-                    response.sendRedirect("viewcontacts");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        } else {
-            // Handle registration failure
-            request.setAttribute("result", "Registration failed. Email might already be in use.");
-            request.getRequestDispatcher("register.jsp").forward(request, response);
-        }
+			if (registrationSuccessful) {
+
+				User user = null;
+
+			    	user = userDao.loginUser(email, password);
+			        if (user != null) {
+
+			        	AuthUtil.loginUser(user, response);
+			            response.sendRedirect("viewcontacts");
+			        }
+
+			} else {
+			    request.setAttribute("result", "Registration failed. Email might already be in use.");
+			    request.getRequestDispatcher("register.jsp").forward(request, response);
+			}
+		} catch (DaoException e) {
+        	ErrorHandlerUtil.handleServerError(response, "Failed to register the user.", e);
+			e.printStackTrace();
+		}
     }
 }

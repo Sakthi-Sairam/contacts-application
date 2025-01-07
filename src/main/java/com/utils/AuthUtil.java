@@ -3,6 +3,7 @@ package com.utils;
 import java.sql.SQLException;
 
 import com.Dao.SessionDao;
+import com.exceptions.DaoException;
 import com.managers.SessionManager;
 import com.models.Session;
 import com.models.User;
@@ -20,9 +21,10 @@ public class AuthUtil {
      *
      * @param user The user object containing the user's details.
      * @param response The HttpServletResponse object used to send the session cookie.
+     * @throws DaoException 
      * @throws SQLException If any SQL errors occur during session creation.
      */
-    public static void loginUser(User user, HttpServletResponse response) throws SQLException {
+    public static void loginUser(User user, HttpServletResponse response) throws DaoException {
     	
         Session session = new Session(user.getUserId());
 

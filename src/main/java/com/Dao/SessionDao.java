@@ -1,75 +1,99 @@
 package com.Dao;
 
-import com.QueryLayer.QueryBuilderOld;
+import com.QueryLayer.QueryBuilder;
+import com.QueryLayer.QueryExecutor;
+import com.QueryLayer.DatabaseSchemaEnums.SessionColumn;
+import com.QueryLayer.DatabaseSchemaEnums.Table;
+import com.exceptions.DaoException;
+import com.exceptions.QueryExecutorException;
 import com.models.Session;
-import com.utils.DBConnection;
+import com.exceptions.ErrorCode;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 
 public class SessionDao {
 
-    public static void batchUpdateSessions(List<Session> sessionsToUpdate) throws SQLException {
-        String updateSQL = "UPDATE sessions SET lastAccessedTime = ? WHERE sessionId = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(updateSQL)) {
-
+    /**
+     * Batch updates sessions' last accessed time.
+     */
+    public static void batchUpdateSessions(List<Session> sessionsToUpdate) throws DaoException {
+        QueryExecutor executor = new QueryExecutor();
+        try {
+            QueryBuilder qb = new QueryBuilder();
+            executor.transactionStart();
             for (Session session : sessionsToUpdate) {
-                ps.setObject(1, session.getLastAccessedTime());
-                ps.setString(2, session.getSessionId());
-                ps.addBatch();
+                qb.update(Table.SESSIONS)
+                  .set(SessionColumn.LAST_ACCESSED_TIME, session.getLastAccessedTime())
+                  .where(SessionColumn.SESSION_ID, "=", session.getSessionId(), true);
+                executor.executeUpdate(qb);
             }
-            ps.executeBatch();
+            executor.transactionEnd();
+        } catch (QueryExecutorException e) {
+            throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to batch update sessions: " + e.getMessage(), e);
         }
     }
-    public static void deleteExpiredSessions(long expirationTime) throws SQLException {
-        new QueryBuilderOld()
-            .delete("sessions")
-            .where("lastAccessedTime", "<",  expirationTime, true)
-            .execute();
+
+    /**
+     * Deletes expired sessions.
+     */
+    public static void deleteExpiredSessions(long expirationTime) throws DaoException {
+    	QueryBuilder qb = new QueryBuilder();
+        QueryExecutor executor = new QueryExecutor();
+        try {
+                qb.delete(Table.SESSIONS)
+                .where(SessionColumn.LAST_ACCESSED_TIME, "<", expirationTime, true);
+                executor.executeUpdate(qb);
+        } catch (QueryExecutorException e) {
+            throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to delete expired sessions: " + e.getMessage(), e);
+        }
     }
 
-    public static void deleteSessionById(String id) throws SQLException {
-        new QueryBuilderOld()
-            .delete("sessions")
-            .where("sessionId", "=", id, true)
-            .execute();
+    /**
+     * Deletes a session by its ID.
+     */
+    public static void deleteSessionById(String id) throws DaoException {
+    	QueryBuilder qb = new QueryBuilder();
+        QueryExecutor executor = new QueryExecutor();
+        try {
+                qb.delete(Table.SESSIONS)
+                .where(SessionColumn.SESSION_ID, "=", id, true);
+                executor.executeUpdate(qb);
+        } catch (QueryExecutorException e) {
+            throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to delete session: " + e.getMessage(), e);
+        }
     }
 
-    public static void createSession(String sessionId, int userId, long lastAccessedTime, long createdAt) throws SQLException {
-        new QueryBuilderOld()
-            .insert("sessions")
-            .columns("sessionId", "user_id", "lastAccessedTime", "createdAt")
-            .values(sessionId, userId, lastAccessedTime, createdAt)
-            .execute();
+    /**
+     * Creates a new session.
+     */
+    public static void createSession(String sessionId, int userId, long lastAccessedTime, long createdAt) throws DaoException {
+    	QueryBuilder qb = new QueryBuilder();
+        QueryExecutor executor = new QueryExecutor();
+    	try {
+            qb.insert(Table.SESSIONS)
+                .columns(SessionColumn.SESSION_ID, SessionColumn.USER_ID, SessionColumn.LAST_ACCESSED_TIME, SessionColumn.CREATED_AT)
+                .values(sessionId, userId, lastAccessedTime, createdAt);
+            executor.executeUpdate(qb);
+        } catch (QueryExecutorException e) {
+            throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to create session: " + e.getMessage(), e);
+        }
     }
 
-    public static Session getSession(String sessionId) {
-        Session session = null;
-        List<Object> results;
-		try {
-			results = new QueryBuilderOld()
-			    .select("sessionId","user_id","lastAccessedTime","createdAt")
-			    .from("sessions")
-			    .where("sessionId", "=", sessionId, true)
-			    .execute();
-			
-	        if (!results.isEmpty()) {
-	            session = new Session(
-	                (String) results.get(0),
-	                (Integer) results.get(1),
-	                ((long) results.get(2)),
-	                ((long) results.get(3))
-	            );
-	        }
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    /**
+     * Retrieves a session by its ID.
+     */
+    public static Session getSession(String sessionId) throws DaoException {
+        QueryBuilder qb = new QueryBuilder();
+        QueryExecutor executor = new QueryExecutor();
+        try {
+            qb.select(SessionColumn.SESSION_ID, SessionColumn.USER_ID, SessionColumn.LAST_ACCESSED_TIME, SessionColumn.CREATED_AT)
+              .from(Table.SESSIONS)
+              .where(SessionColumn.SESSION_ID, "=", sessionId, true);
 
-
-        return session;
+            List<Session> results = executor.executeQuery(qb, Session.class);
+            return results.isEmpty() ? null : results.get(0);
+        } catch (QueryExecutorException e) {
+            throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to retrieve session: " + e.getMessage(), e);
+        }
     }
 }

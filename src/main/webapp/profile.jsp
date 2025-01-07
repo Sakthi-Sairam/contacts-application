@@ -26,17 +26,17 @@
 	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
 	crossorigin="anonymous"></script>
 
-<link rel="stylesheet" type="text/css" href="./styles/dashboard.css">
-<link rel="stylesheet" type="text/css" href="./styles/profile.css">
+	<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/styles/dashboard.css">
+<link rel="stylesheet" type="text/css"  href="<%= request.getContextPath() %>/styles/profile.css">
 
 
 
 </head>
 <body>
 	<div class="sidebar">
-		<a class="" href="dashboard.jsp">All Contacts</a> <a class="active"
-			href="profile.jsp">Profile</a> <a href="archived.jsp">Archieved</a> <a
-			href="categories.jsp">Categories</a> <a href="logout" class="logout">Logout</a>
+		<a class="" href="contacts">All Contacts</a> <a class="active"
+			href="profile">Profile</a> <a href="archived">Archieved</a> <a
+			href="categories">Categories</a> <a href="logout" class="logout">Logout</a>
 	</div>
 	<%
 	User user = (User)SessionFilter.getCurrentUser();
@@ -93,13 +93,13 @@
 													out.println("<tr>");
 													out.println("<td>" + i.getEmail() + "</td>");
 													out.println("<td>");
-													String endPoint = String.format("primaryemail/%d/%d/%d",user.getUserId(),user.getPrimaryEmailId(),i.getId());
+													String endPoint = String.format("email/%d/%d/%d?action=changePrimary",user.getUserId(),user.getPrimaryEmailId(),i.getId());
 													out.println("    <form action='"+ endPoint +"' method='post' style='display:inline;'>");
 													out.println(
 													"        <button type='submit' class='btn btn-warning' title='primary email' onclick='return confirm(\"Are you sure you want to change this as primary?\");'>");
 													out.println(
-													i.getIsPrimary() == 1 ? " <img src='styles/star.svg' alt='Star Icon' style='width: 20px; height: 20px;'"
-															: "<img src='styles/transparentstar.svg' alt='Star Icon' style='width: 20px; height: 20px;'");
+													i.getIsPrimary() == 1 ? " <img src='"+request.getContextPath()+"/styles/star.svg' alt='Star Icon' style='width: 20px; height: 20px;'"
+															: "<img src='"+request.getContextPath()+"/styles/transparentstar.svg' alt='Star Icon' style='width: 20px; height: 20px;'");
 													out.println("        </button>");
 													out.println("    </form>");
 													out.println("</td>");
@@ -134,7 +134,7 @@
 						</div>
 						<div class="modal-body">
 							<div class="container">
-								<form action="addemail/<%=user.getUserId()%>" method="post">
+								<form action="/email/<%=user.getUserId()%>?action=add" method="post">
 									<div class="form-group">
 										<label for="email">Email:</label> <input type="email"
 											id="email" name="email" required>

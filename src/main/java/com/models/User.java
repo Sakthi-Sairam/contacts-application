@@ -28,15 +28,15 @@ public class User {
 
 	private Integer primaryEmailId = null;
 	
-	List<Contact> myContacts;
-	List<Contact> favourites;
-	List<Contact> archieves;
+//	List<Contact> myContacts;
+//	List<Contact> favourites;
+//	List<Contact> archieves;
 	List<Email> emails;
 	
 	public User() {
-		this.myContacts = new ArrayList<>();
-		this.favourites = new ArrayList<>();
-		this.archieves = new ArrayList<>();
+//		this.myContacts = new ArrayList<>();
+//		this.favourites = new ArrayList<>();
+//		this.archieves = new ArrayList<>();
 		this.emails = new ArrayList<>();
 	}
 	public User(int userId, String firstName, String lastName, int age, String address, String phone) {
@@ -46,9 +46,9 @@ public class User {
 		this.age = age;
 		this.address = address;
 		this.phone = phone;
-		this.myContacts = new ArrayList<>();
-		this.favourites = new ArrayList<>();
-		this.archieves = new ArrayList<>();
+//		this.myContacts = new ArrayList<>();
+//		this.favourites = new ArrayList<>();
+//		this.archieves = new ArrayList<>();
 		this.emails = new ArrayList<>();
 		
 	}
@@ -111,28 +111,28 @@ public class User {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-    public List<Contact> getMyContacts() {
-        return myContacts;
-    }
-
-    public void setMyContacts(List<Contact> myContacts) {
-    	this.myContacts = new ArrayList<>(myContacts);
-    }
-
-	public List<Contact> getFavourites() {
-		return favourites;
-	}
-
-	public void setFavourites(List<Contact> favourites) {
-		this.favourites = favourites;
-	}
-	public List<Contact> getArchieves() {
-		return archieves;
-	}
-
-	public void setArchieves(List<Contact> archieves) {
-		this.archieves = archieves;
-	}
+//    public List<Contact> getMyContacts() {
+//        return myContacts;
+//    }
+//
+//    public void setMyContacts(List<Contact> myContacts) {
+//    	this.myContacts = new ArrayList<>(myContacts);
+//    }
+//
+//	public List<Contact> getFavourites() {
+//		return favourites;
+//	}
+//
+//	public void setFavourites(List<Contact> favourites) {
+//		this.favourites = favourites;
+//	}
+//	public List<Contact> getArchieves() {
+//		return archieves;
+//	}
+//
+//	public void setArchieves(List<Contact> archieves) {
+//		this.archieves = archieves;
+//	}
 
 	public List<Email> getEmails() {
 		return emails;
@@ -185,8 +185,7 @@ public class User {
 	public String toString() {
 		return "User [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", age=" + age
 				+ ", address=" + address + ", phone=" + phone + ", password=" + password + ", primaryEmailId="
-				+ primaryEmailId + ", myContacts=" + myContacts + ", favourites=" + favourites + ", archieves="
-				+ archieves + ", emails=" + emails + "]";
+				+ primaryEmailId + ", emails=" + emails + "]";
 	}
 	
 	

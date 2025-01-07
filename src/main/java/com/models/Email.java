@@ -60,6 +60,11 @@ public class Email {
 	public void setModifiedAt(long modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
+	@Override
+	public String toString() {
+		return "Email [id=" + id + ", email=" + email + ", isPrimary=" + isPrimary + ", createdAt=" + createdAt
+				+ ", modifiedAt=" + modifiedAt + "]";
+	}
 	
 
 }

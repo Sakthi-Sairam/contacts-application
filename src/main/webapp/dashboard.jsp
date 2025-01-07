@@ -1,3 +1,5 @@
+<%@page import="com.Dao.ContactDao"%>
+<%@page import="com.Dao.userDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="com.models.User" %>
@@ -16,29 +18,38 @@
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    <link rel="stylesheet" type="text/css" href="./styles/dashboard.css">
-
+	<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/styles/dashboard.css">
     
 </head>
 
 <body>
 	<div class="sidebar">
-	  <a class="active" href="dashboard.jsp">All Contacts</a>
-	<a class="" href="profile.jsp">Profile</a>
-	  <a href="archived.jsp">Archived</a>
-	  <a href="categories.jsp">Categories</a>
+	  <a class="active" href="contacts">All Contacts</a>
+	<a class="" href="profile">Profile</a>
+	  <a href="archived">Archived</a>
+	  <a href="categories">Categories</a>
 	  <a href="logout" class="logout">Logout</a>
 	</div>
 <div class="content">
+
+	<%
+		String errorMessage = (String) request.getParameter("errorMessage");
+		if (errorMessage != null && !errorMessage.isEmpty()) {
+	%>
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+		  <strong>ERROR</strong> <%= errorMessage %>
+		  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+	<%
+		}
+	%>
+
+
     <h1 class="mt-3 mb-3 heading ">Welcome to Dashboard</h1>
     <%
-        //User user = (User) session.getAttribute("user"); 
-    	User user = (User) SessionFilter.getCurrentUser();
-    	        
-        //Boolean contactsLoaded = (Boolean)session.getAttribute("contactsLoaded");
-        //if(contactsLoaded==null || !contactsLoaded){
-        	//response.sendRedirect("viewcontacts");
-        //}
+    	User user = (User) request.getAttribute("user");
+	    List<Contact> contacts = (List<Contact>) request.getAttribute("contacts");
+        List<Contact> favourites = (List<Contact>) request.getAttribute("favourites");
     %>
     <h2 class="text-center">Hello <%= user.getFirstName() %>....</h2>
     
@@ -63,7 +74,6 @@
     <tbody>
     
         <%
-        List<Contact> contacts = user.getMyContacts();
         if (contacts != null && !contacts.isEmpty()) {
             for (Contact i : contacts) {
                 out.println("<tr>");
@@ -72,8 +82,7 @@
                 out.println("<td>" + i.getPhone() + "</td>");
                 out.println("<td>" + i.getAddress() + "</td>");
                 out.println("<td>");
-                out.println("    <form action='deleteContact' method='post' style='display:inline;'>");
-                out.println("        <input type='hidden' name='contactId' value='" + i.getMyContactsID() + "'>");
+                out.println("    <form action='/contacts/" + i.getMyContactsID() + "?action=delete' method='post' style='display:inline;'>");
                 out.println("        <button type='submit' class='btn btn-danger' title='Delete' onclick='return confirm(\"Are you sure you want to delete this contact?\");'>");
                 out.println("            <i class='bi bi-trash3-fill'></i>");
                 out.println("        </button>");
@@ -105,7 +114,6 @@
     <tbody>
     
         <%
-        List<Contact> favourites = user.getFavourites();
         if (favourites != null && !favourites.isEmpty()) {
             for (Contact i : favourites) {
                 out.println("<tr>");
@@ -133,7 +141,7 @@
       </div>
       <div class="modal-body">
       	<div class="container">
-		<form action="addcontact" method="post" class="addcontact">
+		<form action="/contacts?action=add" method="post" class="addcontact">
 		    <div class="form-group">
 		        <label for="friend_email">Email:</label>
 		        <input type="email" id="friend_email" name="friend_email" required>
@@ -183,7 +191,7 @@ if (contacts != null && !contacts.isEmpty()) {
       </div>
       <div class="modal-body">
         <div class="container">
-          <form action="editContact" method="post" class="editcontact addcontact">
+          <form action="/contacts/<%=i.getMyContactsID()%>?action=edit" method='post' class="editcontact addcontact">
             <input type="hidden" name="contactId" value="<%= i.getMyContactsID() %>">
             <div class="form-group">
                 <label for="friend_email">Email:</label>
@@ -221,7 +229,7 @@ if (contacts != null && !contacts.isEmpty()) {
 <%
             }
         }
-        %>
+%>
 
 
 

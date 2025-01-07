@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.Dao.userDao;
+import com.exceptions.DaoException;
 import com.managers.LoggerManager;
 import com.managers.SessionManager;
 import com.models.Session;
@@ -30,6 +31,8 @@ public class SessionFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         
         String requestURI = httpRequest.getRequestURI();
+        String queryString = httpRequest.getQueryString();
+        String requestURL = httpRequest.getRequestURL().toString() + (queryString != null ? "?" + queryString : "");
         
         LOGGER.fine("Processing request: " + requestURI);
 
@@ -49,12 +52,14 @@ public class SessionFilter implements Filter {
         String sessionId = getSessionIdFromCookies(httpRequest.getCookies());
         if (sessionId == null) {
             LOGGER.warning("No session ID found, redirecting to login");
-            httpResponse.sendRedirect("login.jsp");
+            httpResponse.sendRedirect("/login");
             return;
         }
 
         // Log access details
-        logAccessDetails(requestURI, sessionId);
+//        logAccessDetails(requestURI, sessionId);
+        logAccessDetails(requestURL, sessionId);
+
 
         // Validate session
         if (!validateAndProcessSession(httpRequest, httpResponse, sessionId)) {
@@ -101,7 +106,7 @@ public class SessionFilter implements Filter {
                 long now = System.currentTimeMillis();
                 if (session.getLastAccessedTime() + SessionManager.TIMEOUT_MINUTES * 60000L >= now) {
                     LOGGER.info("Active session found, redirecting to dashboard");
-                    httpResponse.sendRedirect("dashboard.jsp");
+                    httpResponse.sendRedirect("/contacts");
                     return;
                 }
             }
@@ -118,7 +123,7 @@ public class SessionFilter implements Filter {
 
         if (storedSession == null) {
             LOGGER.warning("No session found for ID: " + sessionId);
-            httpResponse.sendRedirect("login.jsp");
+            httpResponse.sendRedirect("/login");
             return false;
         }
 
@@ -134,7 +139,7 @@ public class SessionFilter implements Filter {
             SessionManager.removeSession(sessionId);
             clearSessionAndCookies(httpResponse);
             
-            httpResponse.sendRedirect("login.jsp");
+            httpResponse.sendRedirect("/login");
             return false;
         }
 
@@ -143,7 +148,13 @@ public class SessionFilter implements Filter {
         SessionManager.updateSession(sessionId, userId);
         
         if (!SessionManager.userMap.containsKey(userId)) {
-            User user = userDao.getUserById(userId);
+            User user = null;
+			try {
+				user = userDao.getUserById(userId);
+			} catch (DaoException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             SessionManager.userMap.put(userId, user);
         }
 
@@ -176,5 +187,10 @@ public class SessionFilter implements Filter {
 
     public static User getCurrentUser() {
         return threadLocalSession.get();
+    }
+    public static void setCurrentUser(User user) {
+    	System.out.println(user.getEmails());
+    	threadLocalSession.remove();
+    	threadLocalSession.set(user);
     }
 }

@@ -34,6 +34,9 @@ import java.sql.SQLException;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 
+import com.exceptions.ErrorCode;
+import com.exceptions.QueryExecutorException;
+
 public class DBConnection {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/DemoContacts";
     private static final String DB_USER = "root";
@@ -50,13 +53,13 @@ public class DBConnection {
         dataSource.setMaxTotal(25);
     }
 
-    public static Connection getConnection()  {
+    public static Connection getConnection() throws QueryExecutorException  {
         try {
 			return dataSource.getConnection();
 		} catch (SQLException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			throw new QueryExecutorException(ErrorCode.DATABASE_CONNECTION_ERROR, "Database connection failed", e);
 		}
-		return null;
     }
 }
 

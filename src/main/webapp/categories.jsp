@@ -3,6 +3,7 @@
 <%@ page import="com.models.CategoryDetails" %>
 <%@ page import="com.models.Contact" %>
 <%@ page import="com.Dao.CategoriesDao" %>
+<%@page import="com.Dao.ContactDao"%>
 <%@ page import="java.util.*" %>
 <%@ page import="com.filters.SessionFilter" %>
 <!DOCTYPE html>	
@@ -17,10 +18,10 @@
 </head>
 <body>
     	<div class="sidebar">
-	  <a class="" href="dashboard.jsp">All Contacts</a>
-	<a class="" href="profile.jsp">Profile</a>
-	  <a class="" href="archived.jsp">Archieved</a>
-	  <a href="categories.jsp" class="active">Categories</a>
+	  <a class="" href="contacts">All Contacts</a>
+	<a class="" href="profile">Profile</a>
+	  <a class="" href="archived">Archieved</a>
+	  <a href="categories" class="active">Categories</a>
 	  <a href="logout" class="logout">Logout</a>
 	</div>
 	<div class="content">
@@ -28,20 +29,19 @@
         <h1 class="mt-3">Manage Categories</h1>
         
         <%
-                User user = (User)SessionFilter.getCurrentUser();
+                User user = (User) request.getAttribute("user");
 
-				List<CategoryDetails> categories = CategoriesDao.getCategoriesByUserId(user.getUserId());
-				List<Contact> contacts = user.getMyContacts();
+				List<CategoryDetails> categories = (List<CategoryDetails>) request.getAttribute("categories");
+				List<Contact> contacts = (List<Contact>) request.getAttribute("contacts");
 
                 String addResult = (String)request.getAttribute("addResult");
                 if (addResult!=null)out.println(addResult);
           %>
 
-        <form action="createCategory" method="post">
+        <form action="/categories?action=create" method="post">
             <div class="mb-3">
                 <label for="categoryName" class="form-label">Category Name</label>
                 <input type="text" class="form-control" id="categoryName" name="categoryName" required>
-                <input type="hidden" name="userId" value="<%=user.getUserId()%>">
             </div>
             <button type="submit" class="mybutton">Create Category</button>
         </form>
@@ -71,8 +71,7 @@
                     }
                     out.println("</td>");
                     out.println("<td>");
-                    out.println("    <form action='deleteCategory' method='post' style='display:inline;'>");
-                    out.println("        <input type='hidden' name='categoryId' value='" + category.getCategoryId() + "'>");
+                    out.println("    <form action='/categories/" + category.getCategoryId() + "?action=delete' method='post' style='display:inline;'>");
                     out.println("        <button type='submit' class='btn btn-danger' title='Delete' onclick='return confirm(\"Are you sure you want to delete this category?\");'>");
                     out.println("            <i class='bi bi-trash3-fill'></i>");
                     out.println("        </button>");
@@ -87,7 +86,7 @@
     
     
         <h3>Assign Contact to Category</h3>
-        <form action="assignContactToCategory" method="post">
+        <form action="/categories?action=assignContact" method="post">
             <div class="form-group">
                 <label for="category">Select Category:</label>
                 <select id="category" name="categoryId" required>

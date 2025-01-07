@@ -76,4 +76,10 @@ public class CategoryDetails {
 	public void setModifiedAt(long modifiedAt) {
 		this.modifiedAt = modifiedAt;
 	}
+	
+	@Override
+	public String toString() {
+		return "CategoryDetails [categoryId=" + categoryId + ", categoryName=" + categoryName + ", createdAt="
+				+ createdAt + ", modifiedAt=" + modifiedAt + ", categoryContacts=" + categoryContacts + "]";
+	}
 }
