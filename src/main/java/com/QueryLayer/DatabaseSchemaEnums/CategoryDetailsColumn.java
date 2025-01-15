@@ -1,5 +1,9 @@
 package com.QueryLayer.DatabaseSchemaEnums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Enum for CategoryDetail columns
  */
@@ -19,6 +23,9 @@ public enum CategoryDetailsColumn implements Column {
     @Override
     public Table getTable() {
         return Table.CATEGORY_DETAILS;
+    }
+    public Column[] getAllColumns(){
+    	return CategoryDetailsColumn.values();
     }
 
     @Override

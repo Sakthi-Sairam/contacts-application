@@ -28,6 +28,7 @@ public class QueryBuilder {
     public QueryBuilder from(Table table) {
         String queryString = query.getQueryString() + " FROM " + table.getTableName();
         query.setQueryString(queryString);
+        query.addTable(table);
         return this;
     }
 
@@ -43,6 +44,7 @@ public class QueryBuilder {
         String queryString = query.getQueryString();
         queryString += " WHERE " + col.toString() + " " + condition + " " + formatValue(value);
         query.setQueryString(queryString);
+        query.addCondition(col, condition, value);
         return this;
     }
 
@@ -50,6 +52,7 @@ public class QueryBuilder {
         String queryString = query.getQueryString();
         queryString += " " + col.toString() + " " + condition + " " + formatValue(value);
         query.setQueryString(queryString);
+        query.addCondition(col, condition, value);
         return this;
     }
 
@@ -70,6 +73,7 @@ public class QueryBuilder {
         query.setQueryType(QueryType.INSERT);
         String insertQuery = "INSERT INTO " + table.getTableName();
         query.setQueryString(insertQuery);
+        query.addTable(table);
         return this;
     }
 
@@ -79,6 +83,7 @@ public class QueryBuilder {
         for (Column col : columns) {
             queryString.append(prefix).append(col.toString());
             prefix = ", ";
+            query.addColumn(col);
         }
         queryString.append(")");
         query.setQueryString(queryString.toString());
@@ -91,6 +96,7 @@ public class QueryBuilder {
         for (Object val : values) {
             queryString.append(prefix).append(formatValue(val));
             prefix = ", ";
+            query.addValue(val);
         }
         queryString.append(")");
         query.setQueryString(queryString.toString());
@@ -102,6 +108,7 @@ public class QueryBuilder {
         query.setQueryType(QueryType.DELETE);
         String deleteQuery = "DELETE FROM " + table.getTableName();
         query.setQueryString(deleteQuery);
+        query.addTable(table);
         return this;
     }
     
@@ -110,6 +117,7 @@ public class QueryBuilder {
         query.setQueryType(QueryType.UPDATE);
         String updateQuery = "UPDATE " + table.getTableName();
         query.setQueryString(updateQuery);
+        query.addTable(table);
         return this;
     }
 
@@ -122,6 +130,8 @@ public class QueryBuilder {
         }
         queryString += column.toString() + " = " + formatValue(value);
         query.setQueryString(queryString);
+        query.addColumn(column);
+        query.addValue(value);
         return this;
     }
 
@@ -137,6 +147,9 @@ public class QueryBuilder {
 
     // helper method
     private String formatValue(Object value) {
+        if (value == null) {
+            return "NULL";
+        }
         if (value instanceof String) {
             return "'" + value + "'";
         } else {

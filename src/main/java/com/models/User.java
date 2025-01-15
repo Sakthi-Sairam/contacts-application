@@ -2,7 +2,7 @@ package com.models;
 
 import java.util.*;
 
-public class User {
+public class User implements BaseModel{
 	@Column(name = "userdata.user_id")
 	private int userId;
 	@Column(name = "userdata.first_name")
@@ -28,15 +28,9 @@ public class User {
 
 	private Integer primaryEmailId = null;
 	
-//	List<Contact> myContacts;
-//	List<Contact> favourites;
-//	List<Contact> archieves;
 	List<Email> emails;
 	
 	public User() {
-//		this.myContacts = new ArrayList<>();
-//		this.favourites = new ArrayList<>();
-//		this.archieves = new ArrayList<>();
 		this.emails = new ArrayList<>();
 	}
 	public User(int userId, String firstName, String lastName, int age, String address, String phone) {
@@ -46,9 +40,6 @@ public class User {
 		this.age = age;
 		this.address = address;
 		this.phone = phone;
-//		this.myContacts = new ArrayList<>();
-//		this.favourites = new ArrayList<>();
-//		this.archieves = new ArrayList<>();
 		this.emails = new ArrayList<>();
 		
 	}
@@ -186,6 +177,10 @@ public class User {
 		return "User [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", age=" + age
 				+ ", address=" + address + ", phone=" + phone + ", password=" + password + ", primaryEmailId="
 				+ primaryEmailId + ", emails=" + emails + "]";
+	}
+	@Override
+	public Object getPrimaryKeyValue() {
+		return userId;
 	}
 	
 	

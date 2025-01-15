@@ -1,5 +1,9 @@
 package com.QueryLayer.DatabaseSchemaEnums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Enum for sessions columns
  */
@@ -18,6 +22,9 @@ public enum SessionColumn implements Column {
     @Override
     public Table getTable() {
         return Table.SESSIONS;
+    }
+    public Column[] getAllColumns(){
+    	return SessionColumn.values();
     }
 
     @Override

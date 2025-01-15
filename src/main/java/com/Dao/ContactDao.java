@@ -2,6 +2,7 @@ package com.Dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.QueryLayer.Pair;
 import com.QueryLayer.QueryBuilder;
 import com.QueryLayer.QueryExecutor;
 import com.QueryLayer.DatabaseSchemaEnums.CategoryListColumn;
@@ -28,7 +29,8 @@ public class ContactDao {
                        MyContactsDataColumn.IS_FAVORITE, MyContactsDataColumn.CREATED_AT, MyContactsDataColumn.MODIFIED_AT)
               .values(userId, friendEmail, aliasName, phone, address, isArchived, isFavorite, currentTime, currentTime);
 
-            int rowCount = executor.executeUpdate(qb);
+            Pair result = executor.executeUpdateWithGeneratedKeys(qb);
+            int rowCount = result.getRowCount();
             if (rowCount == 0) {
                 throw new DaoException(ErrorCode.DATA_NOT_FOUND, "No contact was added to the database.");
             }

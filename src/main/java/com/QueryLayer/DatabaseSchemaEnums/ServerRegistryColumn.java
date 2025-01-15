@@ -1,5 +1,9 @@
 package com.QueryLayer.DatabaseSchemaEnums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public enum ServerRegistryColumn implements Column{
     ID("id"),
     IP_ADDRESS("ip_address"),
@@ -15,6 +19,9 @@ public enum ServerRegistryColumn implements Column{
 
     public String getColumnName() {
         return columnName;
+    }
+    public Column[] getAllColumns(){
+    	return ServerRegistryColumn.values();
     }
 
 	@Override

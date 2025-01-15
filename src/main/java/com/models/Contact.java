@@ -1,8 +1,8 @@
 package com.models;
 
-public class Contact {
+public class Contact implements BaseModel{
 	@Column(name = "MyContactsData.MyContactsID")
-	private int MyContactsID;
+	private int contactId;
 	@Column(name = "MyContactsData.alias_fnd_name")
 	private String alias_name;
 	@Column(name = "MyContactsData.friend_email")
@@ -23,8 +23,8 @@ public class Contact {
     private long modifiedAt;
 	
 	public Contact() {}
-	public Contact(int MyContactsID, String alias_name, String friend_email, String phone, String address, int isArchived, int isFavorite) {
-		this.MyContactsID = MyContactsID;
+	public Contact(int contactsID, String alias_name, String friend_email, String phone, String address, int isArchived, int isFavorite) {
+		this.contactId = contactsID;
 		this.alias_name = alias_name;
 		this.friend_email = friend_email;
 		this.phone = phone;
@@ -33,7 +33,7 @@ public class Contact {
 		this.isFavorite = isFavorite;
 	}
 	public Contact(int myContactsID, String alias_name, String friend_email, String phone, String address, int isArchived, int isFavorite, long createdAt, long modifiedAt) {
-		MyContactsID = myContactsID;
+		contactId = myContactsID;
 		this.alias_name = alias_name;
 		this.friend_email = friend_email;
 		this.phone = phone;
@@ -44,10 +44,10 @@ public class Contact {
 		this.modifiedAt = modifiedAt;
 	}
 	public int getMyContactsID() {
-		return MyContactsID;
+		return contactId;
 	}
 	public void setMyContactsID(int MyContactsID) {
-		this.MyContactsID = MyContactsID;
+		this.contactId = MyContactsID;
 	}
 	public String getAlias_name() {
 		return alias_name;
@@ -100,9 +100,13 @@ public class Contact {
 	
 	@Override
 	public String toString() {
-		return "Contact [MyContactsID=" + MyContactsID + ", alias_name=" + alias_name + ", friend_email=" + friend_email
+		return "Contact [MyContactsID=" + contactId + ", alias_name=" + alias_name + ", friend_email=" + friend_email
 				+ ", phone=" + phone + ", address=" + address + ", isArchived=" + isArchived + ", isFavorite="
 				+ isFavorite + ", createdAt=" + createdAt + ", modifiedAt=" + modifiedAt + "]";
+	}
+	@Override
+	public Object getPrimaryKeyValue() {
+		return contactId;
 	}
 	
 	

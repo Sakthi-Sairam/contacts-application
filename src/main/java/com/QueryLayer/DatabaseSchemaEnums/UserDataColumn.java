@@ -1,5 +1,9 @@
 package com.QueryLayer.DatabaseSchemaEnums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Enum for UserData columns
  */
@@ -19,12 +23,15 @@ public enum UserDataColumn implements Column {
     UserDataColumn(String columnName) {
         this.columnName = columnName;
     }
-
+    @Override
+    public Column[] getAllColumns(){
+    	return UserDataColumn.values();
+    }
     @Override
     public Table getTable() {
-        return Table.USER_DATA;  // Ensure that USER_DATA is defined in Table enum
+        return Table.USER_DATA;
     }
-
+    
     @Override
     public String toString() {
         return getTable().getTableName() + "." + columnName;

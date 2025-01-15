@@ -25,6 +25,9 @@ public enum MyContactsDataColumn implements Column {
     public Table getTable() {
         return Table.MY_CONTACTS_DATA;
     }
+    public Column[] getAllColumns(){
+    	return MyContactsDataColumn.values();
+    }
 
     @Override
     public String toString() {

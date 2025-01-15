@@ -5,4 +5,5 @@ package com.QueryLayer.DatabaseSchemaEnums;
  */
 public interface Column {
     Table getTable();
+    Column[] getAllColumns();
 }

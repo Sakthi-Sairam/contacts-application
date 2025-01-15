@@ -2,7 +2,7 @@ package com.models;
 
 import java.util.UUID;
 
-public class Session {
+public class Session implements BaseModel{
     private String sessionId;
     private int userId;
     private long lastAccessedTime;
@@ -42,5 +42,10 @@ public class Session {
 
     public long getCreatedAt() { return createdAt; }
     public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+
+	@Override
+	public Object getPrimaryKeyValue() {
+		return this.sessionId;
+	}
 
 }

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import com.Dao.SessionDao;
+import com.exceptions.DaoException;
 import com.managers.SessionManager;
 import com.models.Session;
 /**
@@ -56,7 +57,7 @@ public class InvalidateCacheServlet extends HttpServlet {
             response.getWriter().write("User cache invalidated successfully.");
             try {
 				SessionDao.deleteSessionById(sessionId);
-			} catch (SQLException e) {
+			} catch (DaoException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

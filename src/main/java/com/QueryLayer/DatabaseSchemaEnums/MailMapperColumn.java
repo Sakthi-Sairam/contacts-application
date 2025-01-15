@@ -1,5 +1,8 @@
 package com.QueryLayer.DatabaseSchemaEnums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Enum for MailMapper column
@@ -20,6 +23,9 @@ public enum MailMapperColumn implements Column {
     @Override
     public String toString() {
         return getTable().getTableName() + "." + columnName;
+    }
+    public Column[] getAllColumns(){
+    	return MailMapperColumn.values();
     }
 
     @Override

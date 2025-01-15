@@ -49,7 +49,8 @@
     <tbody>
 	<h3 class="heading">Archieved Contacts</h3>
 	    <%
-        List<Contact> contacts = ContactDao.getArchivedContactsByUserId(user.getUserId());
+       // List<Contact> contacts = ContactDao.getArchivedContactsByUserId(user.getUserId());
+	    List<Contact> contacts = null;
         if (contacts != null && !contacts.isEmpty()) {
             for (Contact i : contacts) {
                 out.println("<tr>");

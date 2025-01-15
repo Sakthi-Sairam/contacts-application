@@ -3,7 +3,7 @@ package com.models;
 import java.util.*;
 import com.models.Column;
 
-public class CategoryDetails {
+public class CategoryDetails implements BaseModel{
     @Column(name = "CategoryDetails.categoryId")
     private int categoryId;
 
@@ -81,5 +81,10 @@ public class CategoryDetails {
 	public String toString() {
 		return "CategoryDetails [categoryId=" + categoryId + ", categoryName=" + categoryName + ", createdAt="
 				+ createdAt + ", modifiedAt=" + modifiedAt + ", categoryContacts=" + categoryContacts + "]";
+	}
+
+	@Override
+	public Object getPrimaryKeyValue() {
+		return this.categoryId;
 	}
 }

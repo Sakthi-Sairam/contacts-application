@@ -1,6 +1,6 @@
 package com.models;
 
-public class Email {
+public class Email implements BaseModel{
 	@Column(name = "MailMapper.id")
 	private int id;
 	@Column(name="MailMapper.email")
@@ -64,6 +64,10 @@ public class Email {
 	public String toString() {
 		return "Email [id=" + id + ", email=" + email + ", isPrimary=" + isPrimary + ", createdAt=" + createdAt
 				+ ", modifiedAt=" + modifiedAt + "]";
+	}
+	@Override
+	public Object getPrimaryKeyValue() {
+		return this.id;
 	}
 	
 

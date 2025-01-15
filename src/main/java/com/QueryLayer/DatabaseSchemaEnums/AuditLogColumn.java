@@ -1,5 +1,9 @@
 package com.QueryLayer.DatabaseSchemaEnums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public enum AuditLogColumn implements Column{
 		AUDIT_ID("audit_id"),
 		TABLE_NAME("table_name"),
@@ -18,6 +22,10 @@ public enum AuditLogColumn implements Column{
     @Override
     public Table getTable() {
         return Table.AUDIT_LOG;
+    }
+    
+    public Column[] getAllColumns(){
+    	return AuditLogColumn.values();
     }
 
     @Override

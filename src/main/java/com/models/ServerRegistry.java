@@ -1,6 +1,6 @@
 package com.models;
 
-public class ServerRegistry {
+public class ServerRegistry implements BaseModel{
 
     public ServerRegistry() {}
 
@@ -66,4 +66,9 @@ public class ServerRegistry {
     public void setLastHeartbeat(String lastHeartbeat) {
         this.lastHeartbeat = lastHeartbeat;
     }
+
+	@Override
+	public Object getPrimaryKeyValue() {
+		return this.id;
+	}
 }
