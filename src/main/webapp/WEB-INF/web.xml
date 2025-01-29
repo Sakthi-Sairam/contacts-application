@@ -13,7 +13,7 @@
     <servlet-name>default</servlet-name>
     <url-pattern>/styles/*</url-pattern>
   </servlet-mapping>
-  <servlet>
+   <servlet>
     <servlet-name>LoginServlet</servlet-name>
     <servlet-class>com.Servlets.LoginServlet</servlet-class>
   </servlet>
@@ -29,42 +29,4 @@
     <servlet-name>LogoutServlet</servlet-name>
     <url-pattern>/logout</url-pattern>
   </servlet-mapping>
-  <servlet>
-    <servlet-name>EditContactServlet</servlet-name>
-    <servlet-class>com.Servlets.EditContactServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>EditContactServlet</servlet-name>
-    <url-pattern>/editContact</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>ProfileController</display-name>
-    <servlet-name>ProfileController</servlet-name>
-    <servlet-class>com.Servlets.ProfileController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>ProfileController</servlet-name>
-    <url-pattern>/ProfileController</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>EmailController</display-name>
-    <servlet-name>EmailController</servlet-name>
-    <servlet-class>com.Servlets.EmailController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>EmailController</servlet-name>
-    <url-pattern>/EmailController</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <description></description>
-    <display-name>CategoryController</display-name>
-    <servlet-name>CategoryController</servlet-name>
-    <servlet-class>com.Servlets.CategoryController</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>CategoryController</servlet-name>
-    <url-pattern>/CategoryController</url-pattern>
-  </servlet-mapping>
-</web-app>
+</web-app>	

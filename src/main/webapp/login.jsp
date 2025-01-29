@@ -87,6 +87,10 @@ a{
             if(errmsg!=null) out.println(errmsg);
             %>
         </form>
+        <!-- 
+        <form action="googleLogin">
+        <input type="submit" value="sign up with google" class="btn">
+        </form>  -->
     </div>
 </body>
 </html>

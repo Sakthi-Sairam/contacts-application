@@ -26,8 +26,10 @@
 	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
 	crossorigin="anonymous"></script>
 
-	<link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/styles/dashboard.css">
-<link rel="stylesheet" type="text/css"  href="<%= request.getContextPath() %>/styles/profile.css">
+<link rel="stylesheet" type="text/css"
+	href="<%= request.getContextPath() %>/styles/dashboard.css">
+<link rel="stylesheet" type="text/css"
+	href="<%= request.getContextPath() %>/styles/profile.css">
 
 
 
@@ -70,6 +72,10 @@
 						<strong>Phone:</strong>
 						<%=user.getPhone()%></p>
 				</div>
+				<form action="googleLogin">
+					<input type="submit" value="import contacts from google"
+						class="btn btn-primary">
+				</form>
 
 			</div>
 
@@ -81,7 +87,7 @@
 				<thead>
 					<tr>
 						<th>Email_id</th>
-						<th>Primary</th> 
+						<th>Primary</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -134,15 +140,15 @@
 						</div>
 						<div class="modal-body">
 							<div class="container">
-								<form action="/email/<%=user.getUserId()%>?action=add" method="post">
+								<form action="/email/<%=user.getUserId()%>?action=add"
+									method="post">
 									<div class="form-group">
 										<label for="email">Email:</label> <input type="email"
 											id="email" name="email" required>
 									</div>
 									<!--  <input type="hidden" name="user_id"
 										value="<%=user.getUserId()%>">-->
-									<input type="submit"
-										class="mybutton mt-1" value="Add Email">
+									<input type="submit" class="mybutton mt-1" value="Add Email">
 								</form>
 
 							</div>

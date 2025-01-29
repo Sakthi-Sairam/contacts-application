@@ -16,6 +16,9 @@ public class Contact implements BaseModel{
 	@Column(name = "MyContactsData.isFavorite")
 	private int isFavorite;
 	
+	@Column(name = "MyContactsData.resourceName")
+	private String resourceName;
+	
 	@Column(name ="MyContactsData.createdAt")
     private long createdAt;
 	
@@ -84,6 +87,12 @@ public class Contact implements BaseModel{
 	}
 	public void setIsFavorite(int isFavorite) {
 		this.isFavorite = isFavorite;
+	}
+	public String getResourceName() {
+		return resourceName;
+	}
+	public void setResourceName(String resourceName) {
+		this.resourceName = resourceName;
 	}
 	public long getCreatedAt() {
 		return createdAt;

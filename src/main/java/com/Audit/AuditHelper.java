@@ -17,7 +17,7 @@ public class AuditHelper {
 	public void audit(QueryBuilder qb) {
 		
 		Table table = qb.query.getTables().get(0);
-		if(table==Table.AUDIT_LOG || table==Table.SESSIONS || table==Table.SERVER_REGISTRY) return;
+		if(table==Table.AUDIT_LOG || table==Table.SESSIONS || table==Table.SERVER_REGISTRY || table==Table.OAUTH_TOKENS) return;
 		
 		switch (qb.query.getQueryType()) {
 		case QueryType.INSERT:

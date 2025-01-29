@@ -1,0 +1,17 @@
+src/main/resources/
+
+# Ignore build directories
+/build/
+/target/
+/out/
+/bin/
+
+# Ignore Eclipse-specific files
+.metadata/
+.settings/
+*.launch
+
+# Ignore other common files
+*.class
+*.jar
+*.war

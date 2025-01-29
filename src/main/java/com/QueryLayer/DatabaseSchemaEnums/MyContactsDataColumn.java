@@ -12,6 +12,7 @@ public enum MyContactsDataColumn implements Column {
     ADDRESS("address"),
     IS_ARCHIVED("isArchived"),
     IS_FAVORITE("isFavorite"),
+    RESOURCE_NAME("resourceName"),
 	CREATED_AT("createdAt"),
 	MODIFIED_AT("modifiedAt");
 
