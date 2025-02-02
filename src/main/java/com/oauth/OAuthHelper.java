@@ -7,7 +7,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.Dao.ContactDao;
+import com.dao.ContactDao;
 import com.exceptions.DaoException;
 import com.models.Contact;
 
@@ -61,7 +61,6 @@ public class OAuthHelper {
 			    }
 			}
 		} catch (DaoException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

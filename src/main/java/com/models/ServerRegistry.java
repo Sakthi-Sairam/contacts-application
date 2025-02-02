@@ -1,17 +1,7 @@
 package com.models;
 
 public class ServerRegistry implements BaseModel{
-
-    public ServerRegistry() {}
-
-    public ServerRegistry(int id, String ipAddress, int portNumber, String registeredAt, String lastHeartbeat) {
-        this.id = id;
-        this.ipAddress = ipAddress;
-        this.portNumber = portNumber;
-        this.registeredAt = registeredAt;
-        this.lastHeartbeat = lastHeartbeat;
-    }
-
+	
     @Column(name = "server_registry.id")
     private int id;
 
@@ -26,6 +16,16 @@ public class ServerRegistry implements BaseModel{
 
     @Column(name = "server_registry.last_heartbeat")
     private String lastHeartbeat;
+
+    public ServerRegistry() {}
+
+    public ServerRegistry(int id, String ipAddress, int portNumber, String registeredAt, String lastHeartbeat) {
+        this.id = id;
+        this.ipAddress = ipAddress;
+        this.portNumber = portNumber;
+        this.registeredAt = registeredAt;
+        this.lastHeartbeat = lastHeartbeat;
+    }
 
     public int getId() {
         return id;

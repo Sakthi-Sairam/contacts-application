@@ -1,5 +1,5 @@
-<%@page import="com.Dao.ContactDao"%>
-<%@page import="com.Dao.userDao"%>
+<%@page import="com.dao.ContactDao"%>
+<%@page import="com.dao.UserDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="com.models.User"%>

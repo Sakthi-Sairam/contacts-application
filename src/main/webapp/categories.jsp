@@ -2,8 +2,8 @@
 <%@ page import="com.models.User" %>
 <%@ page import="com.models.CategoryDetails" %>
 <%@ page import="com.models.Contact" %>
-<%@ page import="com.Dao.CategoriesDao" %>
-<%@page import="com.Dao.ContactDao"%>
+<%@ page import="com.dao.CategoriesDao" %>
+<%@page import="com.dao.ContactDao"%>
 <%@ page import="java.util.*" %>
 <%@ page import="com.filters.SessionFilter" %>
 <!DOCTYPE html>	

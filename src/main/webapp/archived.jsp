@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
     
 <%@ page import="com.models.User" %>
-<%@page import="com.Dao.ContactDao"%>
+<%@page import="com.dao.ContactDao"%>
 <%@ page import="com.models.Contact" %>
 <%@ page import="com.filters.SessionFilter" %>
 <%@ page import="java.util.*" %>

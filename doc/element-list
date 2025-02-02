@@ -1,6 +1,6 @@
-com.Dao
+com.dao
 com.filters
 com.managers
 com.models
-com.Servlets
+com.servlets
 com.utils

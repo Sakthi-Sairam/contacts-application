@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.Dao.userDao;
+import com.dao.UserDao;
 import com.exceptions.DaoException;
 import com.managers.LoggerManager;
 import com.managers.SessionManager;
@@ -137,7 +137,7 @@ public class SessionFilter implements Filter {
             
             // Remove session from manager and clear cookie
             SessionManager.removeSession(sessionId);
-            clearSessionAndCookies(httpResponse);
+//            clearSessionAndCookies(httpResponse);
             
             httpResponse.sendRedirect("/login");
             return false;
@@ -150,7 +150,7 @@ public class SessionFilter implements Filter {
         if (!SessionManager.userMap.containsKey(userId)) {
             User user = null;
 			try {
-				user = userDao.getUserById(userId);
+				user = UserDao.getUserById(userId);
 			} catch (DaoException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

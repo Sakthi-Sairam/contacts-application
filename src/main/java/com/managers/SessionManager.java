@@ -2,8 +2,8 @@ package com.managers;
 
 import com.models.Session;
 import com.models.User;
-import com.Dao.SessionDao;
-import com.Dao.userDao;
+import com.dao.SessionDao;
+import com.dao.UserDao;
 import com.exceptions.DaoException;
 
 import java.sql.SQLException;
@@ -105,7 +105,7 @@ public class SessionManager {
 //        LOGGER.info("Adding session for user: " + userId);
         sessionMap.put(session.getSessionId(), session);
         try {
-			userMap.putIfAbsent(userId, userDao.getUserById(userId));
+			userMap.putIfAbsent(userId, UserDao.getUserById(userId));
 		} catch (DaoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -153,7 +153,8 @@ public class SessionManager {
         SessionDao.deleteExpiredSessions(expirationTime);
     }
 
-    private static void updateSessionsInDB() {
+    public static void updateSessionsInDB() {
+    	System.out.println(sessionsToUpdate);
         if (!sessionsToUpdate.isEmpty()) {
             try {
 //                LOGGER.info("Batch updating " + sessionsToUpdate.size() + " sessions");
@@ -187,7 +188,7 @@ public class SessionManager {
             Thread.currentThread().interrupt();
         }
         LOGGER.info("SessionManager shutdown complete");
-    }
+    } 
 
     public static User getUser(int userId) {
         return userMap.get(userId);

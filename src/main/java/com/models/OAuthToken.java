@@ -1,69 +1,76 @@
 package com.models;
 
-public class OAuthToken implements BaseModel{
-    private int id;
-    private int userId;
-    private String accessToken;
-    private String refreshToken;
-    private int expiresIn;
-    private long createdAt;
-    private long updatedAt;
+public class OAuthToken implements BaseModel {
+	@Column(name = "oauth_tokens.id")
+	private int id;
+	@Column(name = "oauth_tokens.user_id")
+	private int userId;
+	@Column(name = "oauth_tokens.refresh_token")
+	private String refreshToken;
+	@Column(name = "oauth_tokens.email")
+	private String email;
+	@Column(name = "oauth_tokens.provider")
+	private String provider;
+	@Column(name = "oauth_tokens.created_at")
+	private long createdAt;
+	@Column(name = "oauth_tokens.updated_at")
+	private long updatedAt;
 
-    public int getId() {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public void setId(int id) {
-        this.id = id;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public int getUserId() {
-        return userId;
-    }
+	public int getUserId() {
+		return userId;
+	}
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
 
-    public String getAccessToken() {
-        return accessToken;
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-    public String getRefreshToken() {
-        return refreshToken;
-    }
+	public String getProvider() {
+		return provider;
+	}
 
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
+	public void setProvider(String provider) {
+		this.provider = provider;
+	}
 
-    public int getExpiresIn() {
-        return expiresIn;
-    }
+	public String getRefreshToken() {
+		return refreshToken;
+	}
 
-    public void setExpiresIn(int expiresIn) {
-        this.expiresIn = expiresIn;
-    }
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
+	public long getCreatedAt() {
+		return createdAt;
+	}
 
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
-    }
+	public void setCreatedAt(long createdAt) {
+		this.createdAt = createdAt;
+	}
 
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
+	public long getUpdatedAt() {
+		return updatedAt;
+	}
 
-    public void setUpdatedAt(long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+	public void setUpdatedAt(long updatedAt) {
+		this.updatedAt = updatedAt;
+	}
 
 	@Override
 	public Object getPrimaryKeyValue() {

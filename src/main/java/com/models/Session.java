@@ -3,9 +3,13 @@ package com.models;
 import java.util.UUID;
 
 public class Session implements BaseModel{
+	@Column(name = "sessions.sessionId")
     private String sessionId;
+	@Column(name = "sessions.user_id")
     private int userId;
+	@Column(name = "sessions.lastAccessedTime")
     private long lastAccessedTime;
+	@Column(name = "sessions.createdAt")
     private long createdAt;
 //    private User user;
     public Session() {}
@@ -13,7 +17,7 @@ public class Session implements BaseModel{
     public Session(int userId) {
         this.sessionId = UUID.randomUUID().toString(); // Generate random UUID
         this.userId = userId;
-//        this.user = userDao.getUserById(userId);
+//        this.user = UserDao.getUserById(userId);
         this.lastAccessedTime = System.currentTimeMillis();
         this.createdAt = System.currentTimeMillis();
     }

@@ -2,7 +2,7 @@ package com.utils;
 
 import java.sql.SQLException;
 
-import com.Dao.SessionDao;
+import com.dao.SessionDao;
 import com.exceptions.DaoException;
 import com.managers.SessionManager;
 import com.models.Session;
