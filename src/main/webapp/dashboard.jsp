@@ -4,7 +4,7 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="com.models.User"%>
 <%@ page import="com.models.Contact"%>
-<%@ page import="com.filters.SessionFilter"%>
+<%@ page import="com.filters.AuthFilter"%>
 <%@ page import="java.util.*"%>
 
 
@@ -18,6 +18,7 @@
 	rel="stylesheet"
 	integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
 	crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
 	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
@@ -32,11 +33,37 @@
 </head>
 
 <body>
-	<div class="sidebar">
-		<a class="active" href="contacts">All Contacts</a> <a class=""
-			href="profile">Profile</a> <a href="archived">Archived</a> <a
-			href="categories">Categories</a> <a href="logout" class="logout">Logout</a>
-	</div>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>Contact Manager</h2>
+    </div>
+    <nav class="sidebar-nav">
+        <a class="active" href="/contacts">
+            <i class="bi bi-person-lines-fill"></i>
+            All Contacts
+        </a>
+        <a href="/profile">
+            <i class="bi bi-person-circle"></i>
+            Profile
+        </a>
+        <a href="/group/archived">
+            <i class="bi bi-archive"></i>
+            Archived
+        </a>
+        <a href="/group/favourites">
+            <i class="bi bi-heart"></i>
+            Favourites
+        </a>
+        <a href="/categories">
+            <i class="bi bi-tags"></i>
+            Categories
+        </a>
+        <a href="logout" class="logout">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout
+        </a>
+    </nav>
+</div>
 	<div class="content">
 
 		<%
@@ -79,7 +106,7 @@
 					<th>Contact Name</th>
 					<!--  <th>Email</th> -->
 					<th>Phone</th>
-					<th>Actions</th>
+					<th>Action</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -92,7 +119,7 @@
 					<!--  <tdi.getFriend_email()l() %></td> -->
 					<td><%=i.getPhone()%></td>
 					<td><a href="/contacts/<%=i.getMyContactsID()%>"
-						class="btn btn-info"> View Details </a></td>
+						class="mybutton"> View Details </a></td>
 				</tr>
 				<%
 				}

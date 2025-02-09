@@ -21,7 +21,6 @@ public class InvalidateCacheServlet extends HttpServlet {
 	@Override
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 			resp.getWriter().write(SessionManager.sessionMap.toString());
-			System.out.println("\n \n coming to the invalidatecache endpoint \n \n");
 
 		}
 
@@ -39,18 +38,12 @@ public class InvalidateCacheServlet extends HttpServlet {
             return;
         }
 
-        String sessionId;
-        try {
-            sessionId = (String)sessionIdParam;
-        } catch (NumberFormatException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("Invalid sessionId format.");
-            return;
-        }
+        String sessionId = (String)sessionIdParam;
 
-        // Remove user from cache
-//        Object removedUser = session.remove(sessionId);
+
+
         Session removedSession = SessionManager.sessionMap.remove(sessionId);
+//        SessionManager.removeSession(sessionId);
 
         if (removedSession != null) {
             response.setStatus(HttpServletResponse.SC_OK);
@@ -69,8 +62,4 @@ public class InvalidateCacheServlet extends HttpServlet {
         }
     }
 
-    // Method to add users to cache for testing
-//    public static void addToCache(int sessionId, Object userObject) {
-//        userCache.put(sessionId, userObject);
-//    }
 }

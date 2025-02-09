@@ -8,9 +8,11 @@ import com.models.User;
 import com.queryLayer.Pair;
 import com.queryLayer.QueryBuilder;
 import com.queryLayer.QueryExecutor;
-import com.queryLayer.DatabaseSchemaEnums.MailMapperColumn;
-import com.queryLayer.DatabaseSchemaEnums.Table;
-import com.queryLayer.DatabaseSchemaEnums.UserDataColumn;
+import com.queryLayer.databaseSchemaEnums.MailMapperColumn;
+import com.queryLayer.databaseSchemaEnums.MyContactsDataColumn;
+import com.queryLayer.databaseSchemaEnums.Table;
+import com.queryLayer.databaseSchemaEnums.UserDataColumn;
+
 import java.util.List;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -228,17 +230,15 @@ public class UserDao {
     public static User getUserById(int userId) throws DaoException {
         QueryBuilder qb = new QueryBuilder();
         QueryExecutor executor = new QueryExecutor();
-//        SELECT user_id, first_name, last_name, age, address, phone FROM userdata WHERE user_id = ?
-//                                                                                                                                        select id, email, isPrimary from MailMapper where user_id = ?
         try {
 			qb.select(UserDataColumn.USER_ID,UserDataColumn.FIRST_NAME,UserDataColumn.LAST_NAME,UserDataColumn.AGE,UserDataColumn.ADDRESS,UserDataColumn.PHONE,UserDataColumn.CREATED_AT,UserDataColumn.MODIFIED_AT, MailMapperColumn.ID,MailMapperColumn.EMAIL, MailMapperColumn.IS_PRIMARY, MailMapperColumn.CREATED_AT,MailMapperColumn.MODIFIED_AT)
 			  .from(Table.USER_DATA)
 			  .join(Table.MAIL_MAPPER, UserDataColumn.USER_ID, MailMapperColumn.USER_ID)
-			  .where(UserDataColumn.USER_ID, "=", userId, true);
+			  .where(UserDataColumn.USER_ID, "=", userId, true)
+			  .orderBy(MailMapperColumn.EMAIL, true);
 
 			List<User> users = executor.executeQuery(qb, User.class);
 			User user = users.get(0);
-//        ContactsUtil.getContacts(user);
 			return user;
 		} catch (QueryExecutorException e) {
             throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to get the user" + e.getMessage(), e);

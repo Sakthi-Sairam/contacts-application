@@ -1,6 +1,6 @@
 package com.queryLayer;
 
-import com.queryLayer.DatabaseSchemaEnums.Column;
+import com.queryLayer.databaseSchemaEnums.Column;
 
 public class Condition {
 	private Column column;

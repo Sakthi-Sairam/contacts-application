@@ -1,6 +1,6 @@
 package com.queryLayer;
 
-import com.queryLayer.DatabaseSchemaEnums.*;
+import com.queryLayer.databaseSchemaEnums.*;
 
 public class QueryBuilder {
 
@@ -158,7 +158,7 @@ public class QueryBuilder {
 		}
 	}
 
-	public QueryBuilder orderBy(MyContactsDataColumn aliasFndName, boolean isAscending) {
+	public QueryBuilder orderBy(Column aliasFndName, boolean isAscending) {
 		String queryString = query.getQueryString();
 		queryString += " ORDER BY " + aliasFndName;
 		if (!isAscending)

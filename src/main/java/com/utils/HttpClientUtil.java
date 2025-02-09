@@ -35,4 +35,14 @@ public class HttpClientUtil {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         return response.body();
     }
+    
+    public void sendPostRequestAsync(String url, String params) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(params))
+                .build();
+
+        httpClient.sendAsync(request, HttpResponse.BodyHandlers.discarding());
+    }
 }

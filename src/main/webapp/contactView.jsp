@@ -7,66 +7,58 @@
 <head>
 <meta charset="UTF-8">
 <title>Contact Details</title>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-	rel="stylesheet">
+	rel="stylesheet"
+	integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+	crossorigin="anonymous">
 <script
-	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<style type="text/css">
-body {
-	margin: 0;
-	font-family: "Lato", sans-serif;
-}
+	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+	crossorigin="anonymous"></script>
 
-.sidebar {
-	margin: 0;
-	padding: 0;
-	width: 200px;
-	background-color: #f1f1f1;
-	position: fixed;
-	height: 100%;
-	overflow: hidden;
-}
-
-.sidebar a {
-	display: block;
-	color: black;
-	padding: 16px;
-	text-decoration: none;
-}
-
-.sidebar a.active {
-	background-color: #04AA6D;
-	color: white;
-}
-
-.sidebar a:hover:not(.active) {
-	background-color: #555;
-	color: white;
-}
-
-.logout {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-}
-
-div.content {
-	margin-left: 200px;
-	padding: 1px 16px;
-	height: 1000px;
-}
-</style>
+<link rel="stylesheet" type="text/css"
+	href="<%= request.getContextPath() %>/styles/dashboard.css">
 </head>
 <body>
 	<%
 	Contact contact = (Contact) request.getAttribute("contact");
 	%>
-	<div class="sidebar">
-		<a class="active" href="/contacts">All Contacts</a> <a class=""
-			href="/profile">Profile</a> <a href="/archived">Archived</a> <a
-			href="/categories">Categories</a> <a href="/logout" class="logout">Logout</a>
-	</div>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>Contact Manager</h2>
+    </div>
+    <nav class="sidebar-nav">
+        <a class="active" href="/contacts">
+            <i class="bi bi-person-lines-fill"></i>
+            All Contacts
+        </a>
+        <a href="/profile">
+            <i class="bi bi-person-circle"></i>
+            Profile
+        </a>
+        <a href="/group/archived">
+            <i class="bi bi-archive"></i>
+            Archived
+        </a>
+        <a href="/group/favourites">
+            <i class="bi bi-heart"></i>
+            Favourites
+        </a>
+        <a href="/categories">
+            <i class="bi bi-tags"></i>
+            Categories
+        </a>
+        <a href="logout" class="logout">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout
+        </a>
+    </nav>
+</div>
 	<div class="content">
 		<div class="container mt-4">
 			<h1>Contact Details</h1>
@@ -122,7 +114,7 @@ div.content {
 								<div class="form-group">
 									<label for="friend_email">Email:</label> <input type="email"
 										id="friend_email" name="friend_email"
-										value="<%=contact.getFriend_email()%>" required
+										value="<%=contact.getFriend_email()%>"
 										class="form-control">
 								</div>
 								<div class="form-group">

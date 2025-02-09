@@ -18,7 +18,7 @@
     margin: 0;
     /* font-family: lato; */
     background: aliceblue;
-    background-image: url(https://images.pexels.com/photos/139366/pexels-photo-139366.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1);
+    background-image: url(https://t4.ftcdn.net/jpg/09/69/28/53/360_F_969285367_NuVZTFpgZnpMobKKOXi5ktg1lpCvwgFP.jpg);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -27,7 +27,7 @@
 .container{
 	    color: white;
     text-align: center;
-    background: linear-gradient(109.6deg, rgb(102, 203, 149) 11.2%, rgb(39, 210, 175) 98.7%);
+    background:#2A2F4F;
     padding: 6vw;
     border-radius: 36px;
     box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
@@ -54,7 +54,7 @@ label{
     font-weight: 300;
 }
 .btn {
-    background-color: #04AA6D;
+    background-color: #917FB3;
     color: white;
     padding: 10px 15px;
     border: none;

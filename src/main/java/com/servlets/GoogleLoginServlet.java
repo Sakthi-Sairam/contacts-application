@@ -21,7 +21,7 @@ public class GoogleLoginServlet extends HttpServlet {
 //        request.getSession().setAttribute("oauth_state", state);
         
         String authUrl = String.format("%s?client_id=%s&redirect_uri=%s&response_type=code" +
-                "&scope=%s&access_type=offline", //&prompt=consent
+                "&scope=%s&access_type=offline&prompt=consent", //&prompt=consent
                 OAuthConfig.AUTH_ENDPOINT,
                 OAuthConfig.CLIENT_ID,
                 URLEncoder.encode(OAuthConfig.REDIRECT_URI, StandardCharsets.UTF_8.toString()),

@@ -7,10 +7,10 @@ import com.models.CategoryDetails;
 import com.models.Contact;
 import com.queryLayer.QueryBuilder;
 import com.queryLayer.QueryExecutor;
-import com.queryLayer.DatabaseSchemaEnums.CategoryDetailsColumn;
-import com.queryLayer.DatabaseSchemaEnums.CategoryListColumn;
-import com.queryLayer.DatabaseSchemaEnums.MyContactsDataColumn;
-import com.queryLayer.DatabaseSchemaEnums.Table;
+import com.queryLayer.databaseSchemaEnums.CategoryDetailsColumn;
+import com.queryLayer.databaseSchemaEnums.CategoryListColumn;
+import com.queryLayer.databaseSchemaEnums.MyContactsDataColumn;
+import com.queryLayer.databaseSchemaEnums.Table;
 
 import java.util.List;
 
@@ -125,19 +125,44 @@ public class CategoriesDao {
         }
     }
 
+//	public static CategoryDetails getCategoriesByCategoryId(int categoryId, int userId) throws DaoException {
+//		QueryBuilder qb = new QueryBuilder();
+//		QueryExecutor executor = new QueryExecutor();
+//		
+//		try {
+//			qb.select(CategoryDetailsColumn.CATEGORY_ID, CategoryDetailsColumn.CATEGORY_NAME, 
+//			        CategoryDetailsColumn.CREATED_AT, CategoryDetailsColumn.MODIFIED_AT)
+//			.from(Table.CATEGORY_DETAILS)
+//			.where(CategoryDetailsColumn.USER_ID, "=", userId, true).and()
+//			.where(CategoryDetailsColumn.CATEGORY_ID, "=", categoryId);
+//			List<CategoryDetails> results = executor.executeQuery(qb, CategoryDetails.class);
+//			if (results.isEmpty()) {
+//				return null;
+//			}
+//			return results.get(0);
+//		} catch (QueryExecutorException e) {
+//            throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to retrieve category: " + e.getMessage(), e);
+//		}
+//	}  select * from CategoryDetails a join CategoryList b on a.categoryId = b.categoryId join MyContactsData c on b.MyContactsID = c.MyContactsID where a.categoryId=36;
+
 	public static CategoryDetails getCategoriesByCategoryId(int categoryId, int userId) throws DaoException {
 		QueryBuilder qb = new QueryBuilder();
 		QueryExecutor executor = new QueryExecutor();
 		
 		try {
 			qb.select(CategoryDetailsColumn.CATEGORY_ID, CategoryDetailsColumn.CATEGORY_NAME, 
-			        CategoryDetailsColumn.CREATED_AT, CategoryDetailsColumn.MODIFIED_AT)
+			        CategoryDetailsColumn.CREATED_AT, CategoryDetailsColumn.MODIFIED_AT,
+			        MyContactsDataColumn.MY_CONTACTS_ID, MyContactsDataColumn.ALIAS_FND_NAME,
+					MyContactsDataColumn.FRIEND_EMAIL, MyContactsDataColumn.PHONE, MyContactsDataColumn.ADDRESS,
+					MyContactsDataColumn.IS_ARCHIVED, MyContactsDataColumn.IS_FAVORITE, MyContactsDataColumn.CREATED_AT,
+					MyContactsDataColumn.MODIFIED_AT, MyContactsDataColumn.RESOURCE_NAME)
 			.from(Table.CATEGORY_DETAILS)
+			.join(Table.CATEGORY_LIST, CategoryListColumn.CATEGORY_ID, CategoryDetailsColumn.CATEGORY_ID)
+			.join(Table.MY_CONTACTS_DATA, MyContactsDataColumn.MY_CONTACTS_ID, CategoryListColumn.MY_CONTACTS_ID)
 			.where(CategoryDetailsColumn.USER_ID, "=", userId, true).and()
 			.where(CategoryDetailsColumn.CATEGORY_ID, "=", categoryId);
 			List<CategoryDetails> results = executor.executeQuery(qb, CategoryDetails.class);
 			if (results.isEmpty()) {
-//          throw new DaoException(ErrorCode.DATA_NOT_FOUND, "Contact not found for ID: " + contactId);
 				return null;
 			}
 			return results.get(0);

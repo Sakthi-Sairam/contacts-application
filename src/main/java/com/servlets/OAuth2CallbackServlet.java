@@ -1,7 +1,7 @@
 package com.servlets;
 import com.oauth.OAuthService;
 import com.models.User;
-import com.filters.SessionFilter;
+import com.filters.AuthFilter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,7 +12,6 @@ import java.io.IOException;
 @WebServlet("/oauth2callback")
 public class OAuth2CallbackServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-	private final OAuthService oauthService = new OAuthService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -23,8 +22,8 @@ public class OAuth2CallbackServlet extends HttpServlet {
         }
 
         try {
-            User currentUser = (User) SessionFilter.getCurrentUser();
-            oauthService.processOAuthCallback(code, currentUser);
+            User currentUser = (User) AuthFilter.getCurrentUser();
+            OAuthService.processOAuthCallback(code, currentUser);
             response.sendRedirect("/contacts");
 
         } catch (Exception e) {

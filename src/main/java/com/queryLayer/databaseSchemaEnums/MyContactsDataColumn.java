@@ -1,4 +1,4 @@
-package com.queryLayer.DatabaseSchemaEnums;
+package com.queryLayer.databaseSchemaEnums;
 
 /**
  * Enum for MyContactsData columns

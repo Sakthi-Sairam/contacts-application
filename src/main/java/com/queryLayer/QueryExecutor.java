@@ -200,7 +200,8 @@ public class QueryExecutor {
     private <T extends BaseModel> List<T> mapResultSetToClass(ResultSet resultSet, Class<T> clazz) throws Exception {
         List<T> results = new ArrayList<>();
         ResultSetMetaData rsMetaData = resultSet.getMetaData();
-        Map<Object, T> groupedResults = new HashMap<>();
+//        Map<Object, T> groupedResults = new HashMap<>();
+        Map<Object, T> groupedResults = new LinkedHashMap<>();
         Set<String> columnNames = extractColumnNames(rsMetaData);
 
         while (resultSet.next()) {

@@ -1,4 +1,4 @@
-package com.queryLayer.DatabaseSchemaEnums;
+package com.queryLayer.databaseSchemaEnums;
 
 public enum OAuthTokensColumn implements Column {
     ID("id"),
@@ -6,6 +6,8 @@ public enum OAuthTokensColumn implements Column {
     REFRESH_TOKEN("refresh_token"),
     EMAIL("email"),
     PROVIDER("provider"),
+    SYNC_INTERVAL("sync_interval"),
+    LAST_SYNC("last_sync"),
     CREATED_AT("created_at"),
     UPDATED_AT("updated_at");
 

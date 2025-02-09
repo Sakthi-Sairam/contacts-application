@@ -11,6 +11,10 @@ public class OAuthToken implements BaseModel {
 	private String email;
 	@Column(name = "oauth_tokens.provider")
 	private String provider;
+	@Column(name = "oauth_tokens.sync_interval")
+	private long syncInterval;
+	@Column(name = "oauth_tokens.last_sync")
+	private long lastSync;
 	@Column(name = "oauth_tokens.created_at")
 	private long createdAt;
 	@Column(name = "oauth_tokens.updated_at")
@@ -70,6 +74,22 @@ public class OAuthToken implements BaseModel {
 
 	public void setUpdatedAt(long updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	public long getSyncInterval() {
+		return syncInterval;
+	}
+
+	public void setSyncInterval(long syncInterval) {
+		this.syncInterval = syncInterval;
+	}
+
+	public long getLastSync() {
+		return lastSync;
+	}
+
+	public void setLastSync(long lastSync) {
+		this.lastSync = lastSync;
 	}
 
 	@Override

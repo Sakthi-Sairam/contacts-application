@@ -11,7 +11,7 @@ import com.models.BaseModel;
 import com.queryLayer.Condition;
 import com.queryLayer.QueryBuilder;
 import com.queryLayer.QueryExecutor;
-import com.queryLayer.DatabaseSchemaEnums.*;
+import com.queryLayer.databaseSchemaEnums.*;
 
 public class AuditDao {
 	public static boolean insertRecord(String tableName, String actionType, String oldData, String newData) throws DaoException {

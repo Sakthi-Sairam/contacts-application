@@ -26,9 +26,7 @@ public class ErrorHandlerUtil {
     }
 
     public static void handleRequestError(HttpServletRequest request, HttpServletResponse response, String message, Exception e, String view) throws IOException{
-//        request.setAttribute("errorMessage", message);
         if (e != null) e.printStackTrace();
-//        request.getRequestDispatcher(view).forward(request, response);
         response.sendRedirect(view+"?errorMessage="+message);
     }
 }

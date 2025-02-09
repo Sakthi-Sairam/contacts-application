@@ -1,4 +1,4 @@
-package com.queryLayer.DatabaseSchemaEnums;
+package com.queryLayer.databaseSchemaEnums;
 
 import com.models.CategoryDetails;
 import com.models.CategoryList;

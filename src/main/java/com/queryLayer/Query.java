@@ -2,8 +2,8 @@ package com.queryLayer;
 
 import java.util.*;
 
-import com.queryLayer.DatabaseSchemaEnums.Column;
-import com.queryLayer.DatabaseSchemaEnums.Table;
+import com.queryLayer.databaseSchemaEnums.Column;
+import com.queryLayer.databaseSchemaEnums.Table;
 
 public class Query {
 	private String queryString;

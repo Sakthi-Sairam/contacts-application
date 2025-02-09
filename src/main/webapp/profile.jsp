@@ -1,10 +1,11 @@
-<%@page import="com.filters.SessionFilter"%>
+<%@page import="com.filters.AuthFilter"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
 
 <%@ page import="com.models.Email"%>
 <%@ page import="com.models.User"%>
+<%@ page import="com.models.OAuthToken"%>
 <%@ page import="java.util.*"%>
 <!DOCTYPE html>
 <html>
@@ -35,13 +36,40 @@
 
 </head>
 <body>
-	<div class="sidebar">
-		<a class="" href="contacts">All Contacts</a> <a class="active"
-			href="profile">Profile</a> <a href="archived">Archieved</a> <a
-			href="categories">Categories</a> <a href="logout" class="logout">Logout</a>
-	</div>
+<div class="sidebar">
+    <div class="sidebar-header">
+        <h2>Contact Manager</h2>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="/contacts">
+            <i class="bi bi-person-lines-fill"></i>
+            All Contacts
+        </a>
+        <a class="active" href="/profile">
+            <i class="bi bi-person-circle"></i>
+            Profile
+        </a>
+        <a href="/group/archived">
+            <i class="bi bi-archive"></i>
+            Archived
+        </a>
+        <a href="/group/favourites">
+            <i class="bi bi-heart"></i>
+            Favourites
+        </a>
+        <a href="/categories">
+            <i class="bi bi-tags"></i>
+            Categories
+        </a>
+        <a href="logout" class="logout">
+            <i class="bi bi-box-arrow-right"></i>
+            Logout
+        </a>
+    </nav>
+</div>
 	<%
-	User user = (User)SessionFilter.getCurrentUser();
+	User user = (User)request.getAttribute("user");
+	List<OAuthToken> oAuthTokens = (List<OAuthToken>)request.getAttribute("oAuthTokens");
 	%>
 	<div class="content">
 		<div class="mycontainer">
@@ -81,18 +109,19 @@
 
 		</div>
 		<div class="mycontainer">
-			<h3>Emails</h3>
+			<div class="emails">
+				<h3>Emails</h3>
 
-			<table>
-				<thead>
-					<tr>
-						<th>Email_id</th>
-						<th>Primary</th>
-					</tr>
-				</thead>
-				<tbody>
+				<table>
+					<thead>
+						<tr>
+							<th>Email_id</th>
+							<th>Primary</th>
+						</tr>
+					</thead>
+					<tbody>
 
-					<%
+						<%
 					List<Email> emails = user.getEmails();
 											if (emails != null && !emails.isEmpty()) {
 												for (Email i : emails) {
@@ -115,49 +144,89 @@
 												out.println("<tr><td colspan='4'>No emails found.</td></tr>");
 											}
 					%>
-				</tbody>
-			</table>
+					</tbody>
+				</table>
 
-			<%
+				<%
 			String result = (String) request.getAttribute("result");
 					if (result != null)
 						out.println(result);
 			%>
 
-			<button type="button" class="mybutton mt-2" data-bs-toggle="modal"
-				data-bs-target="#exampleModal">Add new Email</button>
+				<button type="button" class="mybutton mt-2" data-bs-toggle="modal"
+					data-bs-target="#exampleModal">Add new Email</button>
 
 
-			<div class="modal fade" id="exampleModal" tabindex="-1"
-				aria-labelledby="exampleModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h1 class="modal-title fs-5" id="exampleModalLabel">Add new
-								email</h1>
-							<button type="button" class="btn-close" data-bs-dismiss="modal"
-								aria-label="Close"></button>
-						</div>
-						<div class="modal-body">
-							<div class="container">
-								<form action="/email/<%=user.getUserId()%>?action=add"
-									method="post">
-									<div class="form-group">
-										<label for="email">Email:</label> <input type="email"
-											id="email" name="email" required>
-									</div>
-									<!--  <input type="hidden" name="user_id"
+				<div class="modal fade" id="exampleModal" tabindex="-1"
+					aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h1 class="modal-title fs-5" id="exampleModalLabel">Add new
+									email</h1>
+								<button type="button" class="btn-close" data-bs-dismiss="modal"
+									aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<div class="container">
+									<form action="/email/<%=user.getUserId()%>?action=add"
+										method="post">
+										<div class="form-group">
+											<label for="email">Email:</label> <input type="email"
+												id="email" name="email" required>
+										</div>
+										<!--  <input type="hidden" name="user_id"
 										value="<%=user.getUserId()%>">-->
-									<input type="submit" class="mybutton mt-1" value="Add Email">
-								</form>
+										<input type="submit" class="mybutton mt-1" value="Add Email">
+									</form>
 
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
+
+
+
 			</div>
-
-
+		</div>
+		<div class="mycontainer">
+			<div class="sync-settings">
+				<h4>Google Sync Settings</h4>
+				<%
+				for (OAuthToken token : oAuthTokens) {
+				%>
+				<div class="sync-item">
+					<form
+						action="/profile?tokenId=<%=token.getId()%>&action=updateSyncInterval"
+						method="post">
+						<div class="form-group">
+							<label><%=token.getEmail()%>:
+							</label> <select name="syncInterval" class="form-select">
+								<option value="0"
+									<%=token.getSyncInterval() == 0 ? "selected" : ""%>>No
+									Sync</option>
+								<option value="60"
+									<%=token.getSyncInterval() == 60 ? "selected" : ""%>>1
+									Hour</option>
+								<option value="300"
+									<%=token.getSyncInterval() == 300 ? "selected" : ""%>>5
+									Hours</option>
+								<option value="600"
+									<%=token.getSyncInterval() == 600 ? "selected" : ""%>>10
+									Hours</option>
+								<option value="2880"
+									<%=token.getSyncInterval() == 2880 ? "selected" : ""%>>2
+									Days</option>
+							</select>
+						</div>
+						<button type="submit" class="btn btn-sm btn-primary">Update</button>
+					</form>
+				</div>
+				<%
+				}
+				%>
+			</div>
 
 		</div>
 	</div>

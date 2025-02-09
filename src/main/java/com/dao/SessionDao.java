@@ -5,8 +5,8 @@ import com.exceptions.QueryExecutorException;
 import com.models.Session;
 import com.queryLayer.QueryBuilder;
 import com.queryLayer.QueryExecutor;
-import com.queryLayer.DatabaseSchemaEnums.SessionColumn;
-import com.queryLayer.DatabaseSchemaEnums.Table;
+import com.queryLayer.databaseSchemaEnums.SessionColumn;
+import com.queryLayer.databaseSchemaEnums.Table;
 import com.exceptions.ErrorCode;
 
 import java.util.List;

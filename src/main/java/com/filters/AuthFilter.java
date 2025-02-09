@@ -18,11 +18,10 @@ import com.models.Session;
 import com.models.User;
 
 @WebFilter(urlPatterns = {"/*"}, filterName = "SessionFilter")
-public class SessionFilter implements Filter {
+public class AuthFilter implements Filter {
     private static final ThreadLocal<User> threadLocalSession = new ThreadLocal<>();
     private static final Logger ACCESS_LOGGER = LoggerManager.getAccessLogger();
-    private static final Logger LOGGER = Logger.getLogger(SessionFilter.class.getName());
-
+    private static final Logger LOGGER = Logger.getLogger(AuthFilter.class.getName());
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) 
             throws IOException, ServletException {
@@ -137,7 +136,7 @@ public class SessionFilter implements Filter {
             
             // Remove session from manager and clear cookie
             SessionManager.removeSession(sessionId);
-//            clearSessionAndCookies(httpResponse);
+            clearSessionAndCookies(httpResponse);
             
             httpResponse.sendRedirect("/login");
             return false;
@@ -189,7 +188,6 @@ public class SessionFilter implements Filter {
         return threadLocalSession.get();
     }
     public static void setCurrentUser(User user) {
-    	System.out.println(user.getEmails());
     	threadLocalSession.remove();
     	threadLocalSession.set(user);
     }

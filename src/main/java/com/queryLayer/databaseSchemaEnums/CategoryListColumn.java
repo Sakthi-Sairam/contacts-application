@@ -1,4 +1,4 @@
-package com.queryLayer.DatabaseSchemaEnums;
+package com.queryLayer.databaseSchemaEnums;
 
 import java.util.ArrayList;
 import java.util.Arrays;

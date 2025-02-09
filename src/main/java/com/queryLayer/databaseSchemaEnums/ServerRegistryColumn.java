@@ -1,4 +1,4 @@
-package com.queryLayer.DatabaseSchemaEnums;
+package com.queryLayer.databaseSchemaEnums;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,8 +8,7 @@ public enum ServerRegistryColumn implements Column{
     ID("id"),
     IP_ADDRESS("ip_address"),
     PORT_NUMBER("port_number"),
-    REGISTERED_AT("registered_at"),
-    LAST_HEARTBEAT("last_heartbeat");
+    CREATED_AT("created_at");
 
     private final String columnName;
 
@@ -28,4 +27,9 @@ public enum ServerRegistryColumn implements Column{
 	public Table getTable() {
 		return Table.SERVER_REGISTRY;
 	}
+	
+    @Override
+    public String toString() {
+        return getTable().getTableName() + "." + columnName;
+    }
 }

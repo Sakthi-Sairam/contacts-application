@@ -10,9 +10,9 @@ import com.models.Contact;
 import com.queryLayer.Pair;
 import com.queryLayer.QueryBuilder;
 import com.queryLayer.QueryExecutor;
-import com.queryLayer.DatabaseSchemaEnums.CategoryListColumn;
-import com.queryLayer.DatabaseSchemaEnums.MyContactsDataColumn;
-import com.queryLayer.DatabaseSchemaEnums.Table;
+import com.queryLayer.databaseSchemaEnums.CategoryListColumn;
+import com.queryLayer.databaseSchemaEnums.MyContactsDataColumn;
+import com.queryLayer.databaseSchemaEnums.Table;
 
 public class ContactDao {
 
@@ -162,13 +162,14 @@ public class ContactDao {
 			}
 			return results.get(0);
 		} catch (QueryExecutorException e) {
-			throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to retrieve contact: " + e.getMessage(),e);
+			throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to retrieve contact: " + e.getMessage(),
+					e);
 		}
 	}
-	
-	//OAUTH ADDING OF CONTACT
-	public static boolean addContact(String friendEmail, String aliasName, String phone, String address, int userId,String resourceName,
-			int isArchived, int isFavorite) throws DaoException {
+
+	// OAUTH ADDING OF CONTACT
+	public static boolean addContact(String friendEmail, String aliasName, String phone, String address, int userId,
+			String resourceName, int isArchived, int isFavorite) throws DaoException {
 		QueryBuilder qb = new QueryBuilder();
 		QueryExecutor executor = new QueryExecutor();
 		long currentTime = System.currentTimeMillis();
@@ -176,13 +177,13 @@ public class ContactDao {
 			qb.insert(Table.MY_CONTACTS_DATA).columns(MyContactsDataColumn.USER_ID, MyContactsDataColumn.FRIEND_EMAIL,
 					MyContactsDataColumn.ALIAS_FND_NAME, MyContactsDataColumn.PHONE, MyContactsDataColumn.ADDRESS,
 					MyContactsDataColumn.IS_ARCHIVED, MyContactsDataColumn.IS_FAVORITE, MyContactsDataColumn.CREATED_AT,
-					MyContactsDataColumn.MODIFIED_AT,MyContactsDataColumn.RESOURCE_NAME).values(userId, friendEmail, aliasName, phone, address, isArchived,
-							isFavorite, currentTime, currentTime, resourceName);
+					MyContactsDataColumn.MODIFIED_AT, MyContactsDataColumn.RESOURCE_NAME).values(userId, friendEmail,
+							aliasName, phone, address, isArchived, isFavorite, currentTime, currentTime, resourceName);
 
 			Pair result = executor.executeUpdateWithGeneratedKeys(qb);
 			int rowCount = result.getRowCount();
 			if (rowCount == 0) {
-				throw new DaoException(ErrorCode.DATA_NOT_FOUND, "No contact was added to the database.");
+				throw new DaoException(ErrorCode.INVALID_INPUT, "No contact was added to the database.");
 			}
 			return rowCount > 0;
 		} catch (QueryExecutorException e) {

@@ -21,47 +21,49 @@ public class SessionManager {
     public static final int TIMEOUT_MINUTES = 30;
     private static final int MAX_HASHMAP_SIZE = 5;
 
-    // Thread-safe synchronized map for sessions
-    public static final Map<String, Session> sessionMap = Collections.synchronizedMap(new LinkedHashMap<>(5, 0.75f, true) {
+    public static final Map<String, Session> sessionMap = new LinkedHashMap<>(5, 0.75f, true) {
         private static final long serialVersionUID = 1L;
 
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, Session> eldest) {
             return size() > MAX_HASHMAP_SIZE;
         }
-    });
+    };
     
     // Thread-safe map for users
-    public static final Map<Integer, User> userMap = Collections.synchronizedMap(new LinkedHashMap<>(5, 0.75f, true) {
+    public static final Map<Integer, User> userMap = new LinkedHashMap<>(5, 0.75f, true) {
         private static final long serialVersionUID = 1L;
 
         @Override
         protected boolean removeEldestEntry(Map.Entry<Integer, User> eldest) {
             return size() > MAX_HASHMAP_SIZE;
         }
-    });
+    };
     
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private static final List<Session> sessionsToUpdate = Collections.synchronizedList(new ArrayList<>());
+    private static final Set<Session> sessionsToUpdate =Collections.synchronizedSet(new HashSet<>());
 
     public static void startScheduler() {
         LOGGER.info("Starting session management scheduler");
         scheduler.scheduleAtFixedRate(() -> {
+        	System.out.println("starting session management");
+        	System.out.println("session map:::"+sessionMap);
             try {
                 LOGGER.fine("Running scheduled session cleanup");
                 cleanExpiredSessions(TIMEOUT_MINUTES);
                 updateSessionsInDB();
                 cleanExpiredSessionsFromDB(TIMEOUT_MINUTES);
-                
                 synchronized (userMap) {
                     userMap.clear();
                 }
                 
-//                LOGGER.fine("Session cleanup completed");
+                LOGGER.fine("Session cleanup completed");
+                System.out.println("ending session management");
+
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error during scheduled session cleanup", e);
             }
-        }, TIMEOUT_MINUTES, TIMEOUT_MINUTES, TimeUnit.MINUTES);
+        },0,5, TimeUnit.MINUTES);
     }
 
     public static Session getSession(String sessionId) {
@@ -124,7 +126,6 @@ public class SessionManager {
 
     public static void cleanExpiredSessions(int timeoutMinutes) {
         long now = System.currentTimeMillis();
-//        LOGGER.fine("Cleaning expired sessions");
 
         synchronized (sessionMap) {
             Iterator<Map.Entry<String, Session>> iterator = sessionMap.entrySet().iterator();
@@ -154,7 +155,6 @@ public class SessionManager {
     }
 
     public static void updateSessionsInDB() {
-    	System.out.println(sessionsToUpdate);
         if (!sessionsToUpdate.isEmpty()) {
             try {
 //                LOGGER.info("Batch updating " + sessionsToUpdate.size() + " sessions");

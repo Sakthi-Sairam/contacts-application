@@ -21,9 +21,7 @@ import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 public class OAuthService {
-	private final HttpClientUtil httpClientUtil = new HttpClientUtil();
-
-	public void processOAuthCallback(String code, User currentUser) throws Exception {
+	public static void processOAuthCallback(String code, User currentUser) throws Exception {
 		JSONObject tokens = exchangeCodeForTokens(code);
 		String accessToken = tokens.getString("access_token");
 		System.out.println("Access Token: " + accessToken);
@@ -31,12 +29,22 @@ public class OAuthService {
 		addOAuthTokenEntryToDB(tokens, currentUser.getUserId());
 		
 	}
-	public void syncContacts(String accessToken, int userId) throws Exception {
-		String contactsData = fetchContacts(accessToken);
-		String simplifiedContacts = simplifyContactsJson(contactsData);
-		OAuthHelper.addOrUpdateTheContacts(simplifiedContacts, userId);
+	public static void syncContacts(String accessToken, int userId) throws Exception {
+		String nextPageToken = null;
+		do {
+			String contactsData = fetchContacts(accessToken,nextPageToken);
+			nextPageToken = getNextPageToken(contactsData);
+			String simplifiedContacts = simplifyContactsJson(contactsData);
+			OAuthHelper.addOrUpdateTheContacts(simplifiedContacts, userId);
+		}while(nextPageToken!=null);
 	}
-	public JSONObject getAccessTokenWithRefreshToken(String refreshToken) throws IOException, InterruptedException {
+	private static String getNextPageToken(String contactsData) {
+		JSONObject jsonResult = new JSONObject(contactsData);
+		String result = jsonResult.optString("nextPageToken",null);
+		System.out.println("nextPageToken:"+result);
+		return result;
+	}
+	public static JSONObject getAccessTokenWithRefreshToken(String refreshToken) throws IOException, InterruptedException {
 		String params = String.format(
 				"refresh_token=%s&client_id=%s&client_secret=%s&grant_type=refresh_token", refreshToken,
 				OAuthConfig.CLIENT_ID, OAuthConfig.CLIENT_SECRET);
@@ -45,7 +53,7 @@ public class OAuthService {
 		return response;
 	}
 
-	private JSONObject exchangeCodeForTokens(String code) throws IOException, InterruptedException, URISyntaxException {
+	private static JSONObject exchangeCodeForTokens(String code) throws IOException, InterruptedException, URISyntaxException {
 		String params = String.format(
 				"code=%s&client_id=%s&client_secret=%s&redirect_uri=%s&grant_type=authorization_code", code,
 				OAuthConfig.CLIENT_ID, OAuthConfig.CLIENT_SECRET, OAuthConfig.REDIRECT_URI);
@@ -55,12 +63,16 @@ public class OAuthService {
 		return response;
 	}
 
-	private String fetchContacts(String accessToken) throws Exception {
+	private static String fetchContacts(String accessToken, String nextPageToken) throws Exception {
+		HttpClientUtil httpClientUtil = new HttpClientUtil();
 		String url = "https://people.googleapis.com/v1/people/me/connections?personFields=names,emailAddresses,phoneNumbers";
+		if(nextPageToken!=null) {
+			url += "&pageToken="+nextPageToken;
+		}
 		return httpClientUtil.sendGetRequest(url, accessToken);
 	}
 
-	private String simplifyContactsJson(String contactsData) {
+	private static String simplifyContactsJson(String contactsData) {
 		JSONObject originalJson = new JSONObject(contactsData);
 		JSONArray connections = originalJson.optJSONArray("connections");
 
@@ -97,7 +109,7 @@ public class OAuthService {
 		return new JSONObject().put("contacts", simplifiedContacts).toString(2);
 	}
 	
-	private void addOAuthTokenEntryToDB(JSONObject tokens, int UserId) {
+	private static void addOAuthTokenEntryToDB(JSONObject tokens, int userId) {
 		try {
 			String refreshToken = tokens.optString("refresh_token",null);
 			String idToken = tokens.optString("id_token",null);
@@ -105,7 +117,9 @@ public class OAuthService {
 			JWT jwt = JWTParser.parse(idToken);
 	        JWTClaimsSet claims = jwt.getJWTClaimsSet();
 	        String email = claims.getStringClaim("email");
-			OAuthDao.insertOAuthRecord(UserId,refreshToken,email);
+	        boolean isSyncEmailPresent = OAuthDao.isSyncEmailPresent(email,userId);
+			if(!isSyncEmailPresent)
+				OAuthDao.insertOAuthRecord(userId,refreshToken,email);
 		} catch (JSONException e) {
 			return;
 		} catch (DaoException | ParseException e) {

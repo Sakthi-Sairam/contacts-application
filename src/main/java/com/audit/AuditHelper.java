@@ -8,8 +8,8 @@ import java.util.Map;
 import com.exceptions.DaoException;
 import com.models.BaseModel;
 import com.queryLayer.*;
-import com.queryLayer.DatabaseSchemaEnums.Column;
-import com.queryLayer.DatabaseSchemaEnums.Table;
+import com.queryLayer.databaseSchemaEnums.Column;
+import com.queryLayer.databaseSchemaEnums.Table;
 import com.utils.JsonFormatter;
 
 public class AuditHelper {
