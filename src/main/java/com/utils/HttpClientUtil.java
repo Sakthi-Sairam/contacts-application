@@ -37,6 +37,9 @@ public class HttpClientUtil {
     }
     
     public void sendPostRequestAsync(String url, String params) {
+    	if(params==null) {
+    		params = "";
+    	}
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/x-www-form-urlencoded")

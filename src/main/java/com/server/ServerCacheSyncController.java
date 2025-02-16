@@ -5,30 +5,45 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
-import java.sql.SQLException;
 
 import com.dao.SessionDao;
 import com.exceptions.DaoException;
 import com.managers.SessionManager;
 import com.models.Session;
-/**
- * Servlet implementation class InvalidateCacheServlet
- */
-@WebServlet("/invalidatecache")
-public class InvalidateCacheServlet extends HttpServlet {
+import com.utils.ExceptionHandlerUtil;
+
+@WebServlet("/server-cache-sync")
+public class ServerCacheSyncController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	@Override
-		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-			resp.getWriter().write(SessionManager.sessionMap.toString());
+       
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.getWriter().write(SessionManager.sessionMap.toString());
+		response.getWriter().write(ServerCacheManager.serverCache.toString());
+	}
 
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String action = request.getParameter("action").toLowerCase();
+		switch (action) {
+		case "usersync":
+			handleUserSync(request, response);
+			break;
+		case "serversync":
+			handleServerSync(request,response);
+		default:
+			ExceptionHandlerUtil.logAndForwardClientException(request, response, "invalid action query param", null, "/error.jsp", getClass());
 		}
+	}
 
-
-	@Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void handleServerSync(HttpServletRequest request, HttpServletResponse response) {
+		ServerCacheManager.serverCache.clear();
 		
+	}
+
+	private void handleUserSync(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		System.out.println("\n \n coming to the invalidatecache endpoint \n \n");
         String sessionIdParam = request.getParameter("sessionId");
 
@@ -39,11 +54,8 @@ public class InvalidateCacheServlet extends HttpServlet {
         }
 
         String sessionId = (String)sessionIdParam;
-
-
-
+        
         Session removedSession = SessionManager.sessionMap.remove(sessionId);
-//        SessionManager.removeSession(sessionId);
 
         if (removedSession != null) {
             response.setStatus(HttpServletResponse.SC_OK);
@@ -51,8 +63,7 @@ public class InvalidateCacheServlet extends HttpServlet {
             try {
 				SessionDao.deleteSessionById(sessionId);
 			} catch (DaoException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				ExceptionHandlerUtil.logAndForwardServerException(request, response, e, getClass());
 			}
             System.out.print(SessionManager.userMap.get(removedSession.getUserId()));
             SessionManager.userMap.remove(removedSession.getUserId());

@@ -7,12 +7,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import com.dao.UserDao;
 import com.exceptions.DaoException;
-import com.managers.LoggerManager;
+//import com.managers.LoggerManager;
+import com.logs.*;
 import com.managers.SessionManager;
 import com.models.Session;
 import com.models.User;
@@ -20,8 +23,26 @@ import com.models.User;
 @WebFilter(urlPatterns = {"/*"}, filterName = "SessionFilter")
 public class AuthFilter implements Filter {
     private static final ThreadLocal<User> threadLocalSession = new ThreadLocal<>();
-    private static final Logger ACCESS_LOGGER = LoggerManager.getAccessLogger();
     private static final Logger LOGGER = Logger.getLogger(AuthFilter.class.getName());
+    private static final Logger ACCESS_LOGGER = Logger.getLogger("AccessLog");
+
+    static {
+        try {
+            // Configure Access Log
+            FileHandler accessFileHandler = new FileHandler(
+                "/home/sakthi-pt7694/Desktop/jeeProjects1/contactsLogs/access.log",
+                true
+            );
+            accessFileHandler.setFormatter(new SimpleFormatter());
+            ACCESS_LOGGER.addHandler(accessFileHandler);
+            ACCESS_LOGGER.setUseParentHandlers(false);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) 
             throws IOException, ServletException {
@@ -36,7 +57,7 @@ public class AuthFilter implements Filter {
         LOGGER.fine("Processing request: " + requestURI);
 
         // Path to exclude
-        if (requestURI.endsWith("invalidatecache")) {
+        if (requestURI.endsWith("invalidatecache") || requestURI.endsWith("server-cache-sync")) {
             LOGGER.info("Skipping session validation for: " + requestURI);
             chain.doFilter(request, response);
             return;
@@ -57,7 +78,7 @@ public class AuthFilter implements Filter {
 
         // Log access details
 //        logAccessDetails(requestURI, sessionId);
-        logAccessDetails(requestURL, sessionId);
+        logAccessDetails(requestURL, sessionId, httpRequest);
 
 
         // Validate session
@@ -69,7 +90,7 @@ public class AuthFilter implements Filter {
             request.setAttribute("sessionId", sessionId);
             chain.doFilter(request, response);
         } catch (Exception e) {
-            ACCESS_LOGGER.log(Level.SEVERE, "Error processing request", e);
+            LOGGER.log(Level.SEVERE, "Error processing request", e);
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Request processing error");
         } finally {
             threadLocalSession.remove();
@@ -161,10 +182,13 @@ public class AuthFilter implements Filter {
         return true;
     }
 
-    private void logAccessDetails(String requestURI, String sessionId) {
+    private void logAccessDetails(String requestURI, String sessionId, HttpServletRequest request) {
+        String clientIP = request.getRemoteAddr();
+        String method = request.getMethod();
+        
         ACCESS_LOGGER.info(String.format(
-            "Accessed URI: %s | Session ID: %s | Time: %d", 
-            requestURI, sessionId, System.currentTimeMillis()
+            "Method: %s | URI: %s | IP: %s | Session ID: %s | Time: %d", 
+            method, requestURI, clientIP, sessionId, System.currentTimeMillis()
         ));
     }
 

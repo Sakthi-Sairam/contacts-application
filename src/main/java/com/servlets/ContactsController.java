@@ -1,7 +1,7 @@
 package com.servlets;
 
 import com.handlers.ContactsHandler;
-import com.utils.ErrorHandlerUtil;
+import com.utils.ExceptionHandlerUtil;
 import com.utils.PathParamUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,7 +15,7 @@ public class ContactsController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response){
         try {
             String contactParam = PathParamUtil.getSingleParam(request.getPathInfo());
             if (contactParam == null) {
@@ -25,40 +25,33 @@ public class ContactsController extends HttpServlet {
                 ContactsHandler.returnSpecificContact(request, response, contactId);
             }
         } catch (NumberFormatException e) {
-            ErrorHandlerUtil.handleClientError(response, "Invalid contact ID format.");
+            ExceptionHandlerUtil.logAndForwardClientException(request, response, "Invalid contact ID format.", e, "/error.jsp", ContactsController.class);
         } catch (Exception e) {
-            ErrorHandlerUtil.handleServerError(response, "An error occurred while processing the request.", e);
+            ExceptionHandlerUtil.logAndForwardServerException(request, response, e, ContactsController.class);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response){
         String action = request.getParameter("action");
         try {
             switch (action) {
                 case "delete":
-                	ContactsHandler.handleDeleteContact(request, response);
+                    ContactsHandler.handleDeleteContact(request, response);
                     break;
                 case "edit":
-                	ContactsHandler.handleEditContact(request, response);
+                    ContactsHandler.handleEditContact(request, response);
                     break;
                 case "add":
-                	ContactsHandler.handleAddContact(request, response);
+                    ContactsHandler.handleAddContact(request, response);
                     break;
                 default:
-                	ErrorHandlerUtil.handleClientError(response, "Invalid action.");
+                    ExceptionHandlerUtil.logAndForwardClientException(request, response, "Invalid action.", null, "/error.jsp", ContactsController.class);
             }
         } catch (NumberFormatException e) {
-        	ErrorHandlerUtil.handleClientError(response, "Invalid input format.");
+            ExceptionHandlerUtil.logAndForwardClientException(request, response, "Invalid input format.", e, "/error.jsp", ContactsController.class);
         } catch (Exception e) {
-        	ErrorHandlerUtil.handleServerError(response, "An error occurred while processing the request.", e);
+            ExceptionHandlerUtil.logAndForwardServerException(request, response, e, ContactsController.class);
         }
     }
-
-
-
-
-
-
-
 }

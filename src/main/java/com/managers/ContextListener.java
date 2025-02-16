@@ -1,8 +1,12 @@
 package com.managers;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.logging.LogManager;
 
 import com.exceptions.DaoException;
+import com.server.CacheInvalidator;
 import com.server.ServerRegistryDao;
 
 import jakarta.servlet.ServletContextEvent;
@@ -30,6 +34,14 @@ public class ContextListener implements ServletContextListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        CacheInvalidator.broadcastServerCacheInvalidation();
+        
+        try (InputStream is =  ContextListener.class.getClassLoader().getResourceAsStream("logging.properties")) {
+            LogManager.getLogManager().readConfiguration(is);
+            System.out.println("loaded the logging.properties");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         
     }
 

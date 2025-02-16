@@ -25,11 +25,12 @@ public class ContactDao {
 		QueryExecutor executor = new QueryExecutor();
 		long currentTime = System.currentTimeMillis();
 		try {
-			qb.insert(Table.MY_CONTACTS_DATA).columns(MyContactsDataColumn.USER_ID, MyContactsDataColumn.FRIEND_EMAIL,
-					MyContactsDataColumn.ALIAS_FND_NAME, MyContactsDataColumn.PHONE, MyContactsDataColumn.ADDRESS,
-					MyContactsDataColumn.IS_ARCHIVED, MyContactsDataColumn.IS_FAVORITE, MyContactsDataColumn.CREATED_AT,
-					MyContactsDataColumn.MODIFIED_AT).values(userId, friendEmail, aliasName, phone, address, isArchived,
-							isFavorite, currentTime, currentTime);
+			qb.insert(Table.MY_CONTACTS_DATA).set(MyContactsDataColumn.USER_ID, userId)
+					.set(MyContactsDataColumn.FRIEND_EMAIL, friendEmail)
+					.set(MyContactsDataColumn.ALIAS_FND_NAME, aliasName).set(MyContactsDataColumn.PHONE, phone)
+					.set(MyContactsDataColumn.ADDRESS, address).set(MyContactsDataColumn.IS_ARCHIVED, isArchived)
+					.set(MyContactsDataColumn.IS_FAVORITE, isFavorite).set(MyContactsDataColumn.CREATED_AT, currentTime)
+					.set(MyContactsDataColumn.MODIFIED_AT, currentTime);
 
 			Pair result = executor.executeUpdateWithGeneratedKeys(qb);
 			int rowCount = result.getRowCount();
@@ -50,12 +51,31 @@ public class ContactDao {
 		QueryExecutor executor = new QueryExecutor();
 		List<Contact> contacts = new ArrayList<>();
 		try {
-			qb.select(MyContactsDataColumn.MY_CONTACTS_ID, MyContactsDataColumn.ALIAS_FND_NAME,
-					MyContactsDataColumn.FRIEND_EMAIL, MyContactsDataColumn.PHONE, MyContactsDataColumn.ADDRESS,
-					MyContactsDataColumn.IS_ARCHIVED, MyContactsDataColumn.IS_FAVORITE, MyContactsDataColumn.CREATED_AT,
-					MyContactsDataColumn.MODIFIED_AT, MyContactsDataColumn.RESOURCE_NAME).from(Table.MY_CONTACTS_DATA)
-					.where(MyContactsDataColumn.USER_ID, "=", userId, true)
+			qb.select(Table.MY_CONTACTS_DATA).from(Table.MY_CONTACTS_DATA)
+					.where(MyContactsDataColumn.USER_ID, "=", userId)
 					.orderBy(MyContactsDataColumn.ALIAS_FND_NAME, true);
+
+			contacts = executor.executeQuery(qb, Contact.class);
+			return contacts;
+		} catch (QueryExecutorException e) {
+			throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to retrieve contacts: " + e.getMessage(),
+					e);
+		}
+	}
+	
+	/**
+	 * Retrieves all contacts for a specific user page wise
+	 */
+	public static List<Contact> getContactsByUserId(int userId, int limit, int offset) throws DaoException {
+		QueryBuilder qb = new QueryBuilder();
+		QueryExecutor executor = new QueryExecutor();
+		List<Contact> contacts = new ArrayList<>();
+		try {
+			qb.select(Table.MY_CONTACTS_DATA).from(Table.MY_CONTACTS_DATA)
+					.where(MyContactsDataColumn.USER_ID, "=", userId)
+					.orderBy(MyContactsDataColumn.ALIAS_FND_NAME, true)
+					.limit(limit)
+					.offset(offset);
 
 			contacts = executor.executeQuery(qb, Contact.class);
 			return contacts;
@@ -148,16 +168,12 @@ public class ContactDao {
 		QueryExecutor executor = new QueryExecutor();
 
 		try {
-			qb.select(MyContactsDataColumn.MY_CONTACTS_ID, MyContactsDataColumn.ALIAS_FND_NAME,
-					MyContactsDataColumn.FRIEND_EMAIL, MyContactsDataColumn.PHONE, MyContactsDataColumn.ADDRESS,
-					MyContactsDataColumn.IS_ARCHIVED, MyContactsDataColumn.IS_FAVORITE, MyContactsDataColumn.CREATED_AT,
-					MyContactsDataColumn.MODIFIED_AT).from(Table.MY_CONTACTS_DATA)
-					.where(MyContactsDataColumn.USER_ID, "=", userId, true).and()
+			qb.select(Table.MY_CONTACTS_DATA).from(Table.MY_CONTACTS_DATA)
+					.where(MyContactsDataColumn.USER_ID, "=", userId).and()
 					.where(MyContactsDataColumn.MY_CONTACTS_ID, "=", contactId);
 
 			List<Contact> results = executor.executeQuery(qb, Contact.class);
 			if (results.isEmpty()) {
-//                throw new DaoException(ErrorCode.DATA_NOT_FOUND, "Contact not found for ID: " + contactId);
 				return null;
 			}
 			return results.get(0);
@@ -174,11 +190,13 @@ public class ContactDao {
 		QueryExecutor executor = new QueryExecutor();
 		long currentTime = System.currentTimeMillis();
 		try {
-			qb.insert(Table.MY_CONTACTS_DATA).columns(MyContactsDataColumn.USER_ID, MyContactsDataColumn.FRIEND_EMAIL,
-					MyContactsDataColumn.ALIAS_FND_NAME, MyContactsDataColumn.PHONE, MyContactsDataColumn.ADDRESS,
-					MyContactsDataColumn.IS_ARCHIVED, MyContactsDataColumn.IS_FAVORITE, MyContactsDataColumn.CREATED_AT,
-					MyContactsDataColumn.MODIFIED_AT, MyContactsDataColumn.RESOURCE_NAME).values(userId, friendEmail,
-							aliasName, phone, address, isArchived, isFavorite, currentTime, currentTime, resourceName);
+			qb.insert(Table.MY_CONTACTS_DATA).set(MyContactsDataColumn.USER_ID, userId)
+					.set(MyContactsDataColumn.FRIEND_EMAIL, friendEmail)
+					.set(MyContactsDataColumn.ALIAS_FND_NAME, aliasName).set(MyContactsDataColumn.PHONE, phone)
+					.set(MyContactsDataColumn.ADDRESS, address).set(MyContactsDataColumn.IS_ARCHIVED, isArchived)
+					.set(MyContactsDataColumn.IS_FAVORITE, isFavorite).set(MyContactsDataColumn.CREATED_AT, currentTime)
+					.set(MyContactsDataColumn.MODIFIED_AT, currentTime)
+					.set(MyContactsDataColumn.RESOURCE_NAME, resourceName);
 
 			Pair result = executor.executeUpdateWithGeneratedKeys(qb);
 			int rowCount = result.getRowCount();

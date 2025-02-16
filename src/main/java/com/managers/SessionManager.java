@@ -2,6 +2,7 @@ package com.managers;
 
 import com.models.Session;
 import com.models.User;
+import com.cache.CacheManager;
 import com.dao.SessionDao;
 import com.dao.UserDao;
 import com.exceptions.DaoException;
@@ -20,25 +21,9 @@ public class SessionManager {
     
     public static final int TIMEOUT_MINUTES = 30;
     private static final int MAX_HASHMAP_SIZE = 5;
-
-    public static final Map<String, Session> sessionMap = new LinkedHashMap<>(5, 0.75f, true) {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<String, Session> eldest) {
-            return size() > MAX_HASHMAP_SIZE;
-        }
-    };
     
-    // Thread-safe map for users
-    public static final Map<Integer, User> userMap = new LinkedHashMap<>(5, 0.75f, true) {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<Integer, User> eldest) {
-            return size() > MAX_HASHMAP_SIZE;
-        }
-    };
+    public static final CacheManager<String, Session> sessionMap = new CacheManager<>(MAX_HASHMAP_SIZE);
+    public static final CacheManager<Integer, User> userMap = new CacheManager<>(MAX_HASHMAP_SIZE);
     
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private static final Set<Session> sessionsToUpdate =Collections.synchronizedSet(new HashSet<>());
@@ -50,12 +35,14 @@ public class SessionManager {
         	System.out.println("session map:::"+sessionMap);
             try {
                 LOGGER.fine("Running scheduled session cleanup");
-                cleanExpiredSessions(TIMEOUT_MINUTES);
                 updateSessionsInDB();
                 cleanExpiredSessionsFromDB(TIMEOUT_MINUTES);
                 synchronized (userMap) {
                     userMap.clear();
                 }
+                synchronized (sessionMap) {
+					sessionMap.clear();
+				}
                 
                 LOGGER.fine("Session cleanup completed");
                 System.out.println("ending session management");
@@ -121,30 +108,6 @@ public class SessionManager {
             sessionMap.remove(sessionId);
             userMap.remove(userId);
 //            LOGGER.info("Session removed for user: " + userId + ", session: " + sessionId);
-        }
-    }
-
-    public static void cleanExpiredSessions(int timeoutMinutes) {
-        long now = System.currentTimeMillis();
-
-        synchronized (sessionMap) {
-            Iterator<Map.Entry<String, Session>> iterator = sessionMap.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<String, Session> entry = iterator.next();
-                Session session = entry.getValue();
-                
-                if (session.getLastAccessedTime() + (timeoutMinutes * 60000L) < now) {
-                    String sessionId = entry.getKey();
-                    LOGGER.info("Removing expired session: " + sessionId);
-                    iterator.remove();
-                    
-                    try {
-                        SessionDao.deleteSessionById(sessionId);
-                    } catch (Exception e) {
-                        LOGGER.log(Level.WARNING, "Error deleting expired session from DB", e);
-                    }
-                }
-            }
         }
     }
 

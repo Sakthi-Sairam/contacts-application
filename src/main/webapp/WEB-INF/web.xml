@@ -13,7 +13,7 @@
     <servlet-name>default</servlet-name>
     <url-pattern>/styles/*</url-pattern>
   </servlet-mapping>
-   <servlet>
+  <servlet>
     <servlet-name>LoginServlet</servlet-name>
     <servlet-class>com.servlets.LoginServlet</servlet-class>
   </servlet>
@@ -29,4 +29,4 @@
     <servlet-name>LogoutServlet</servlet-name>
     <url-pattern>/logout</url-pattern>
   </servlet-mapping>
-</web-app>	
+</web-app>

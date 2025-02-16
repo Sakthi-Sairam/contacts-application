@@ -9,8 +9,8 @@ public class DaoException extends Exception{
 		this.code = code;
 	}
 	
-	public DaoException(ErrorCode code,String message, Throwable clause) {
-		super(message, clause);
+	public DaoException(ErrorCode code,String message, Throwable cause) {
+		super(message, cause);
 		this.code = code;
 	}
 }

@@ -4,7 +4,7 @@ import com.dao.UserDao;
 import com.exceptions.DaoException;
 import com.models.User;
 import com.utils.AuthUtil;
-import com.utils.ErrorHandlerUtil;
+import com.utils.ExceptionHandlerUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -17,20 +17,18 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * Servlet to handle user registration requests.
- */
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Handles GET requests and forwards to the registration page.
-     */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("register.jsp").forward(request, response);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response){
+        try {
+			request.getRequestDispatcher("register.jsp").forward(request, response);
+		} catch (ServletException | IOException e) {
+			ExceptionHandlerUtil.logAndForwardServerException(request, response, e, getClass());
+		}
     }
 
     /**
@@ -42,7 +40,7 @@ public class RegisterServlet extends HttpServlet {
      * @throws IOException      If an I/O error occurs.
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response){
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String firstName = request.getParameter("firstName");
@@ -76,8 +74,9 @@ public class RegisterServlet extends HttpServlet {
 			    request.getRequestDispatcher("register.jsp").forward(request, response);
 			}
 		} catch (DaoException e) {
-        	ErrorHandlerUtil.handleServerError(response, "Failed to register the user.", e);
-			e.printStackTrace();
+        	ExceptionHandlerUtil.logAndForwardServerException(request, response, e, getClass());
+		} catch (Exception e) {
+        	ExceptionHandlerUtil.logAndForwardServerException(request, response, e, getClass());
 		}
     }
 }

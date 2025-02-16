@@ -84,9 +84,11 @@
 
 		<h1 class="mt-3 mb-3 heading ">Welcome to Dashboard</h1>
 		<%
-		User user = (User) request.getAttribute("user");
-		List<Contact> contacts = (List<Contact>) request.getAttribute("contacts");
-		List<Contact> favourites = (List<Contact>) request.getAttribute("favourites");
+			User user = (User) request.getAttribute("user");
+			List<Contact> contacts = (List<Contact>) request.getAttribute("contacts");
+	        boolean isLastPage = (boolean)request.getAttribute("isLastPage");
+	        int pageNumber = (int)request.getAttribute("pageNumber");
+	        boolean isFirstPage = pageNumber == 0;
 		%>
 		<h2 class="text-center">
 			Hello
@@ -98,13 +100,11 @@
 
 
 		<h3 class="heading my-4">All Contacts</h3>
-		<!--  <a href="viewcontacts" class="mybutton">Refresh contacts</a> -->
 
 		<table>
 			<thead>
 				<tr>
 					<th>Contact Name</th>
-					<!--  <th>Email</th> -->
 					<th>Phone</th>
 					<th>Action</th>
 				</tr>
@@ -116,7 +116,6 @@
 				%>
 				<tr>
 					<td><%=i.getAlias_name()%></td>
-					<!--  <tdi.getFriend_email()l() %></td> -->
 					<td><%=i.getPhone()%></td>
 					<td><a href="/contacts/<%=i.getMyContactsID()%>"
 						class="mybutton"> View Details </a></td>
@@ -133,6 +132,10 @@
 				%>
 			</tbody>
 		</table>
+		<div class="m-3">
+			<%if(!isFirstPage){ %> <a href="/contacts?page=<%=pageNumber-1%>" class="mybutton">Back</a><%}%>
+			<%if(!isLastPage){ %> <a href="/contacts?page=<%=pageNumber+1%>" class="mybutton">Next</a><%}%>
+		</div>
 
 		<div class="modal fade" id="exampleModal" tabindex="-1"
 			aria-labelledby="exampleModalLabel" aria-hidden="true">
