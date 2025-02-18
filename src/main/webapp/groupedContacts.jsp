@@ -37,75 +37,86 @@ List<Contact> groupedContacts = (List<Contact>) request.getAttribute("groupedCon
 
 </head>
 <body>
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h2>Contact Manager</h2>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="/contacts">
-            <i class="bi bi-person-lines-fill"></i>
-            All Contacts
-        </a>
-        <a href="/profile">
-            <i class="bi bi-person-circle"></i>
-            Profile
-        </a>
-        <a class="<%if(title=="Archived") out.print("active"); %>" href="/group/archived">
-            <i class="bi bi-archive"></i>
-            Archived
-        </a>
-        <a class="<%if(title=="Favourites") out.print("active"); %>" href="/group/favourites">
-            <i class="bi bi-heart"></i>
-            Favourites
-        </a>
-        <a href="/categories">
-            <i class="bi bi-tags"></i>
-            Categories
-        </a>
-        <a href="/logout" class="logout">
-            <i class="bi bi-box-arrow-right"></i>
-            Logout
-        </a>
-    </nav>
-</div>
-<div class="content">
-			<h1 class="mt-3 mb-3 heading "><%=title %></h1>
-			<table>
-			<thead>
-				<tr>
-					<th>Contact Name</th>
-					<!--  <th>Email</th> -->
-					<th>Phone</th>
-					<th>Action</th>
-				</tr>
-			</thead>
-			<tbody>
-				<%
-				if (groupedContacts != null && !groupedContacts.isEmpty()) {
-					for (Contact i : groupedContacts) {
-				%>
-				<tr>
-					<td><%=i.getAlias_name()%></td>
-					<!--  <tdi.getFriend_email()l() %></td> -->
-					<td><%=i.getPhone()%></td>
-					<td><a href="/contacts/<%=i.getMyContactsID()%>"
-						class="mybutton"> View Details </a></td>
-				</tr>
-				<%
-				}
-				} else {
-				%>
-				<tr>
-					<td colspan="4">No groupedContacts found.</td>
-				</tr>
-				<%
-				}
-				%>
-			</tbody>
-		</table>
-			
-
-</div>
-
+	<div class="app-container">
+		<input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+		<label for="sidebar-toggle" class="sidebar-toggle-label"> <i
+			class="bi bi-list"></i>
+		</label>
+		<div class="sidebar">
+			<div class="sidebar-header">
+				<i class="bi bi-person-rolodex sidebar-logo"></i>
+				<h2>Contact Manager</h2>
+			</div>
+			<nav class="sidebar-nav">
+				<a href="/contacts"> <i class="bi bi-person-lines-fill"></i> All
+					Contacts
+				</a> <a href="/profile"> <i class="bi bi-person-circle"></i> Profile
+				</a> <a class="<%if (title == "Archived")
+	out.print("active");%>"
+					href="/group/archived"> <i class="bi bi-archive"></i> Archived
+				</a> <a class="<%if (title == "Favourites")
+	out.print("active");%>"
+					href="/group/favourites"> <i class="bi bi-heart"></i>
+					Favourites
+				</a> <a href="/categories"> <i class="bi bi-tags"></i> Categories
+				</a> <a href="/logout" class="logout"> <i
+					class="bi bi-box-arrow-right"></i> Logout
+				</a>
+			</nav>
+		</div>
+		<div class="content">
+			<div class="card contact-card">
+				<div
+					class="card-header d-flex justify-content-between align-items-center">
+					<h3>
+						<i class="bi bi-people"></i>
+						<%=title%></h3>
+					<span class="contact-count badge bg-primary"><%=groupedContacts != null ? groupedContacts.size() : 0%></span>
+				</div>
+				<div class="card-body">
+					<%
+					if (groupedContacts != null && !groupedContacts.isEmpty()) {
+					%>
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th><i class="bi bi-person me-2"></i>Contact Name</th>
+									<th class="text-end">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								<%
+								for (Contact i : groupedContacts) {
+								%>
+								<tr>
+									<td>
+										<div class="contact-name"><%=i.getAlias_name()%></div>
+									</td>
+									<td class="text-end"><a
+										href="/contacts/<%=i.getMyContactsID()%>"
+										class="mybutton view-btn"> <i class="bi bi-eye"></i> View
+									</a></td>
+								</tr>
+								<%
+								}
+								%>
+							</tbody>
+						</table>
+					</div>
+					<%
+					} else {
+					%>
+					<div class="empty-state">
+						<i class="bi bi-person-x empty-icon"></i>
+						<p>No contacts found in this group.</p>
+					</div>
+					<%
+					}
+					%>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

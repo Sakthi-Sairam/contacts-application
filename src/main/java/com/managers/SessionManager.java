@@ -28,30 +28,27 @@ public class SessionManager {
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private static final Set<Session> sessionsToUpdate =Collections.synchronizedSet(new HashSet<>());
 
-    public static void startScheduler() {
-        LOGGER.info("Starting session management scheduler");
-        scheduler.scheduleAtFixedRate(() -> {
-        	System.out.println("starting session management");
-        	System.out.println("session map:::"+sessionMap);
-            try {
-                LOGGER.fine("Running scheduled session cleanup");
-                updateSessionsInDB();
-                cleanExpiredSessionsFromDB(TIMEOUT_MINUTES);
-                synchronized (userMap) {
-                    userMap.clear();
-                }
-                synchronized (sessionMap) {
-					sessionMap.clear();
-				}
-                
-                LOGGER.fine("Session cleanup completed");
-                System.out.println("ending session management");
-
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error during scheduled session cleanup", e);
+    public static final Runnable sessionScheduledTask = () -> {
+    	System.out.println("starting session management");
+    	System.out.println("session map:::"+sessionMap);
+        try {
+            LOGGER.fine("Running scheduled session cleanup");
+            updateSessionsInDB();
+            cleanExpiredSessionsFromDB(TIMEOUT_MINUTES);
+            synchronized (userMap) {
+                userMap.clear();
             }
-        },0,5, TimeUnit.MINUTES);
-    }
+            synchronized (sessionMap) {
+				sessionMap.clear();
+			}
+            
+            LOGGER.fine("Session cleanup completed");
+            System.out.println("ending session management");
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error during scheduled session cleanup", e);
+        }
+    };
 
     public static Session getSession(String sessionId) {
         LOGGER.fine("Retrieving session: " + sessionId);

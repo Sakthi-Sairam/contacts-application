@@ -31,9 +31,9 @@ public class OAuthDao {
         QueryBuilder qb = new QueryBuilder();
         QueryExecutor executor = new QueryExecutor();
         try {
-			qb.select(OAuthTokensColumn.ID.getAllColumns())
+			qb.select(Table.OAUTH_TOKENS)
 			  .from(Table.OAUTH_TOKENS)
-			  .where(OAuthTokensColumn.USER_ID, "=", userId, true);
+			  .where(OAuthTokensColumn.USER_ID, "=", userId);
 
 			List<OAuthToken> oauthAccounts = executor.executeQuery(qb, OAuthToken.class);
 
@@ -82,7 +82,7 @@ public class OAuthDao {
 	        qb.update(Table.OAUTH_TOKENS)
 	          .set(OAuthTokensColumn.LAST_SYNC, currTime)
 	          .set(OAuthTokensColumn.UPDATED_AT, currTime)
-	          .where(OAuthTokensColumn.ID, "=", tokenId, true);
+	          .where(OAuthTokensColumn.ID, "=", tokenId);
 	        executor.executeUpdate(qb);
 	    } catch (QueryExecutorException e) {
 	        throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to update last sync", e);

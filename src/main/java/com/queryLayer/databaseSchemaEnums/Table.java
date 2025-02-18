@@ -3,6 +3,8 @@ package com.queryLayer.databaseSchemaEnums;
 import com.models.CategoryDetails;
 import com.models.CategoryList;
 import com.models.Contact;
+import com.models.ContactEmail;
+import com.models.ContactPhoneNumber;
 import com.models.Email;
 import com.models.OAuthToken;
 import com.models.BaseModel;
@@ -22,6 +24,8 @@ public enum Table {
     SESSIONS("sessions", SessionColumn.class, SessionColumn.SESSION_ID, Session.class),
     USER_DATA("userdata", UserDataColumn.class, UserDataColumn.USER_ID,User.class),
     SERVER_REGISTRY("server_registry", ServerRegistryColumn.class, ServerRegistryColumn.ID,ServerRegistry.class),
+    CONTACTS_PHONE_NUMBER("ContactsPhoneNumber", ContactsPhoneNumberColumn.class, ContactsPhoneNumberColumn.CONTACT_NUMBER_ID, ContactPhoneNumber.class),
+    CONTACTS_EMAIL("ContactsEmail", ContactsEmailColumn.class, ContactsEmailColumn.CONTACT_EMAIL_ID, ContactEmail.class),
     AUDIT_LOG("audit_log", AuditLogColumn.class, AuditLogColumn.AUDIT_ID, null),
     OAUTH_TOKENS("oauth_tokens",OAuthTokensColumn.class,OAuthTokensColumn.ID, OAuthToken.class);
 

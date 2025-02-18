@@ -12,7 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/googleLogin")
 public class GoogleLoginServlet extends HttpServlet {
-    @Override
+    private static final long serialVersionUID = 1L;
+
+	@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response){
         try {
             String authUrl = String.format("%s?client_id=%s&redirect_uri=%s&response_type=code" +

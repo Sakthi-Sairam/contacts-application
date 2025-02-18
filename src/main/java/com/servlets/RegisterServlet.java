@@ -7,7 +7,6 @@ import com.utils.AuthUtil;
 import com.utils.ExceptionHandlerUtil;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -66,7 +65,7 @@ public class RegisterServlet extends HttpServlet {
 			        if (user != null) {
 
 			        	AuthUtil.loginUser(user, response);
-			            response.sendRedirect("viewcontacts");
+			            response.sendRedirect("/contacts");
 			        }
 
 			} else {

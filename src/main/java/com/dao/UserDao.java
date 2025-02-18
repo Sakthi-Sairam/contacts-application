@@ -9,7 +9,6 @@ import com.queryLayer.Pair;
 import com.queryLayer.QueryBuilder;
 import com.queryLayer.QueryExecutor;
 import com.queryLayer.databaseSchemaEnums.MailMapperColumn;
-import com.queryLayer.databaseSchemaEnums.MyContactsDataColumn;
 import com.queryLayer.databaseSchemaEnums.Table;
 import com.queryLayer.databaseSchemaEnums.UserDataColumn;
 
@@ -30,7 +29,7 @@ public class UserDao {
         QueryBuilder qb = new QueryBuilder();
         QueryExecutor executor = new QueryExecutor();
         try {
-			qb.select(MailMapperColumn.EMAIL).from(Table.MAIL_MAPPER).where(MailMapperColumn.EMAIL, "=", email, true);
+			qb.select(Table.MAIL_MAPPER).from(Table.MAIL_MAPPER).where(MailMapperColumn.EMAIL, "=", email);
 			List<Email> results = executor.executeQuery(qb, Email.class);
 			return !results.isEmpty();
 		} catch (QueryExecutorException e) {
@@ -61,7 +60,7 @@ public class UserDao {
                       (age != null && !age.isEmpty()) ? Integer.parseInt(age) : 0, 
                       address, phone, currTime, currTime);
             
-            // Execute and get the generated user ID
+            // get the generated user ID
             Pair result = executor.executeUpdateWithGeneratedKeys(qb);
             int userId = result.getGeneratedKey();
 
@@ -231,10 +230,10 @@ public class UserDao {
         QueryBuilder qb = new QueryBuilder();
         QueryExecutor executor = new QueryExecutor();
         try {
-			qb.select(UserDataColumn.USER_ID,UserDataColumn.FIRST_NAME,UserDataColumn.LAST_NAME,UserDataColumn.AGE,UserDataColumn.ADDRESS,UserDataColumn.PHONE,UserDataColumn.CREATED_AT,UserDataColumn.MODIFIED_AT, MailMapperColumn.ID,MailMapperColumn.EMAIL, MailMapperColumn.IS_PRIMARY, MailMapperColumn.CREATED_AT,MailMapperColumn.MODIFIED_AT)
+			qb.select(Table.USER_DATA, Table.MAIL_MAPPER)
 			  .from(Table.USER_DATA)
 			  .join(Table.MAIL_MAPPER, UserDataColumn.USER_ID, MailMapperColumn.USER_ID)
-			  .where(UserDataColumn.USER_ID, "=", userId, true)
+			  .where(UserDataColumn.USER_ID, "=", userId)
 			  .orderBy(MailMapperColumn.EMAIL, true);
 
 			List<User> users = executor.executeQuery(qb, User.class);
@@ -245,6 +244,23 @@ public class UserDao {
 
 		}
     }
+
+	public static boolean deleteEmail(int emailId, int userId) throws DaoException {
+		QueryBuilder qb = new QueryBuilder();
+		QueryExecutor executor = new QueryExecutor();
+		int rowCount = 0;
+		
+		try {
+			qb.delete(Table.MAIL_MAPPER)
+			.where(MailMapperColumn.ID, "=", emailId)
+			.and().where(MailMapperColumn.USER_ID, "=", userId);
+			System.out.println(qb.build());
+			rowCount = executor.executeUpdate(qb);
+		} catch (QueryExecutorException e) {
+			throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to delete PhoneNumber" + e.getMessage(),e);
+		}
+		return rowCount > 0;
+	}
 
 
 }

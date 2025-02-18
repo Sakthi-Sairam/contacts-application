@@ -19,12 +19,13 @@ public class SessionDao {
     public static void batchUpdateSessions(List<Session> sessionsToUpdate) throws DaoException {
         QueryExecutor executor = new QueryExecutor();
         try {
-            QueryBuilder qb = new QueryBuilder();
+            QueryBuilder qb;
             executor.transactionStart();
             for (Session session : sessionsToUpdate) {
+            	qb = new QueryBuilder();
                 qb.update(Table.SESSIONS)
                   .set(SessionColumn.LAST_ACCESSED_TIME, session.getLastAccessedTime())
-                  .where(SessionColumn.SESSION_ID, "=", session.getSessionId(), true);
+                  .where(SessionColumn.SESSION_ID, "=", session.getSessionId());
                 executor.executeUpdate(qb);
             }
             executor.transactionEnd();

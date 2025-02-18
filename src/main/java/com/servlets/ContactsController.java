@@ -3,12 +3,10 @@ package com.servlets;
 import com.handlers.ContactsHandler;
 import com.utils.ExceptionHandlerUtil;
 import com.utils.PathParamUtil;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @WebServlet("/contacts/*")
 public class ContactsController extends HttpServlet {
@@ -44,6 +42,18 @@ public class ContactsController extends HttpServlet {
                     break;
                 case "add":
                     ContactsHandler.handleAddContact(request, response);
+                    break;
+                case "addPhone":
+                    ContactsHandler.handleAddContactPhone(request, response);
+                    break;
+                case "addEmail":
+                    ContactsHandler.handleAddContactEmail(request, response);
+                    break;
+                case "deleteEmail":
+                    ContactsHandler.handleDeleteContactEmail(request, response);
+                    break;
+                case "deletePhone":
+                    ContactsHandler.handleDeleteContactPhone(request, response);
                     break;
                 default:
                     ExceptionHandlerUtil.logAndForwardClientException(request, response, "Invalid action.", null, "/error.jsp", ContactsController.class);

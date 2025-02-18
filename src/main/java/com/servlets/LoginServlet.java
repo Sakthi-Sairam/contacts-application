@@ -1,7 +1,6 @@
 package com.servlets;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import com.dao.UserDao;
 import com.exceptions.DaoException;
@@ -10,7 +9,6 @@ import com.utils.AuthUtil;
 import com.utils.ExceptionHandlerUtil;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

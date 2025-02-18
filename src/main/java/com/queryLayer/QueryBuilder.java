@@ -181,17 +181,6 @@ public class QueryBuilder {
 		return query.getQueryString() + ";";
 	}
 
-	// helper method
-	private String formatValue(Object value) {
-		if (value == null) {
-			return "NULL";
-		}
-		if (value instanceof String) {
-			return "'" + value + "'";
-		} else {
-			return value.toString();
-		}
-	}
 
 	public QueryBuilder orderBy(Column aliasFndName, boolean isAscending) {
 		String queryString = " ORDER BY " + aliasFndName;

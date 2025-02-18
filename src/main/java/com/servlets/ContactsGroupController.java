@@ -1,13 +1,9 @@
 package com.servlets;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.dao.ContactDao;
-import com.exceptions.DaoException;
 import com.filters.AuthFilter;
 import com.models.Contact;
 import com.models.User;
@@ -15,7 +11,6 @@ import com.utils.ContactsUtil;
 import com.utils.ExceptionHandlerUtil;
 import com.utils.PathParamUtil;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

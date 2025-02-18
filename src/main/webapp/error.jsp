@@ -11,9 +11,19 @@
     </style>
 </head>
 <body>
+
+	<%
+	String errorMessageAttribute = (String)request.getAttribute("errorMessage");
+	String errorMessageParameter = (String)request.getParameter("errorMessage");
+
+	
+	
+	%>
     <div class="error-container">
         <h1>Oops! Something went wrong.</h1>
-        <p><%=request.getAttribute("errorMessage")%></p>
+        
+        <%if(errorMessageAttribute!=null){%> <p><%=errorMessageAttribute%></p> <%} %>
+		<%if(errorMessageParameter!=null){%> <p><%=errorMessageParameter%></p> <%} %>
         <a href="/contacts">Go to Home</a>
     </div>
 </body>

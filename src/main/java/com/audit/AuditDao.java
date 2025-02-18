@@ -43,11 +43,12 @@ public class AuditDao {
 	    List<Condition> conditions = sqlQuery.query.getConditions();
 	    int len = conditions.size();
 		for(int i=0;i<len;i++) {
-			if(i!=0 && i!=len-1) qb.and();
+			if(i!=0 && i!=len) qb.and();
 			Column column = conditions.get(i).getColumn();
 			String operator = conditions.get(i).getOperator();
 			Object value = conditions.get(i).getValue();
-			qb.where(column,operator,value, i==0);
+			qb.where(column,operator,value);
+			System.out.println("AuditDao:: "+qb.build());
 		}
 		try {
 			List<BaseModel> result = (List<BaseModel>) exe.executeQuery(qb, table.getModel());

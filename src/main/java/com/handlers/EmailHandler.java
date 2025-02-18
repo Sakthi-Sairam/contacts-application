@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.dao.UserDao;
 import com.exceptions.DaoException;
+import com.filters.AuthFilter;
 import com.utils.ExceptionHandlerUtil;
 import com.utils.PathParamUtil;
 
@@ -15,9 +16,9 @@ public class EmailHandler {
 	public static void handleChangePrimaryEmail(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		try {
 			String[] pathParams = PathParamUtil.getMultipleParams(request.getPathInfo());
-			int userId = Integer.parseInt(pathParams[0]);
-			int primaryEmailId = Integer.parseInt(pathParams[1]);
-			int emailId = Integer.parseInt(pathParams[2]);
+			int userId = AuthFilter.getCurrentUser().getUserId();
+			int primaryEmailId = Integer.parseInt(pathParams[0]);
+			int emailId = Integer.parseInt(pathParams[1]);
 
 			boolean isSuccess = UserDao.changePrimaryEmail(userId, emailId, primaryEmailId);
 			if (isSuccess) {
@@ -59,9 +60,21 @@ public class EmailHandler {
 		}
 	}
 
-	public static void handleDeleteEmail(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
-		
+	public static void handleDeleteEmail(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+			int emailId = Integer.parseInt(PathParamUtil.getSingleParam(request.getPathInfo()));
+			int userId = AuthFilter.getCurrentUser().getUserId();
+			boolean isSuccess = UserDao.deleteEmail(emailId, userId);
+			if (isSuccess) {
+			    response.sendRedirect("/profile?action=refresh");
+			} else {
+			    ExceptionHandlerUtil.logAndForwardClientException(request, response, "Failed to delete email", null, "/profile", ContactsHandler.class);
+			}
+		} catch (NumberFormatException e) {
+            ExceptionHandlerUtil.logAndForwardClientException(request, response, "Invalid email ID format.", e, "/error.jsp", ContactsHandler.class);
+		} catch (DaoException e) {
+            ExceptionHandlerUtil.logAndForwardServerException(request, response, e, ContactsHandler.class);
+		}
 	}
 
 	public static void handleEditEmail(HttpServletRequest request, HttpServletResponse response) {

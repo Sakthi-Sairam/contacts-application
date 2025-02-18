@@ -1,22 +1,20 @@
 <%@page import="com.filters.AuthFilter"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-
-
 <%@ page import="com.models.Email"%>
 <%@ page import="com.models.User"%>
 <%@ page import="com.models.OAuthToken"%>
 <%@ page import="java.util.*"%>
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Manager - Profile</title>
 
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
 	rel="stylesheet"
@@ -31,203 +29,281 @@
 	href="<%= request.getContextPath() %>/styles/dashboard.css">
 <link rel="stylesheet" type="text/css"
 	href="<%= request.getContextPath() %>/styles/profile.css">
-
-
-
 </head>
+
 <body>
-<div class="sidebar">
-    <div class="sidebar-header">
-        <h2>Contact Manager</h2>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="/contacts">
-            <i class="bi bi-person-lines-fill"></i>
-            All Contacts
-        </a>
-        <a class="active" href="/profile">
-            <i class="bi bi-person-circle"></i>
-            Profile
-        </a>
-        <a href="/group/archived">
-            <i class="bi bi-archive"></i>
-            Archived
-        </a>
-        <a href="/group/favourites">
-            <i class="bi bi-heart"></i>
-            Favourites
-        </a>
-        <a href="/categories">
-            <i class="bi bi-tags"></i>
-            Categories
-        </a>
-        <a href="logout" class="logout">
-            <i class="bi bi-box-arrow-right"></i>
-            Logout
-        </a>
-    </nav>
-</div>
-	<%
-	User user = (User)request.getAttribute("user");
-	List<OAuthToken> oAuthTokens = (List<OAuthToken>)request.getAttribute("oAuthTokens");
-	%>
-	<div class="content">
-		<div class="mycontainer">
-			<div class="profile">
-				<h3>Profile</h3>
-
-				<h5>
-					Hello
-					<%=user.getFirstName()%>
-					<%=user.getLastName()%>...
-				</h5>
-				<img alt="profile-img"
-					src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541">
-				<div class="profile-datas">
-					<p>
-						<strong>User ID:</strong>
-						<%=user.getUserId()%></p>
-					<p>
-						<strong>Name:</strong>
-						<%=user.getFirstName() + " " + user.getLastName()%></p>
-					<p>
-						<strong>Age:</strong>
-						<%=user.getAge()%></p>
-					<p>
-						<strong>Address:</strong>
-						<%=user.getAddress()%></p>
-					<p>
-						<strong>Phone:</strong>
-						<%=user.getPhone()%></p>
-				</div>
-				<form action="googleLogin">
-					<input type="submit" value="import contacts from google"
-						class="btn btn-primary">
-				</form>
-
+	<div class="app-container">
+		<input type="checkbox" id="sidebar-toggle" class="sidebar-toggle">
+		<label for="sidebar-toggle" class="sidebar-toggle-label">
+			<i class="bi bi-list"></i>
+		</label>
+		
+		<div class="sidebar">
+			<div class="sidebar-header">
+				<i class="bi bi-person-rolodex sidebar-logo"></i>
+				<h2>Contact Manager</h2>
 			</div>
-
+			<nav class="sidebar-nav">
+				<a href="/contacts">
+					<i class="bi bi-person-lines-fill"></i>
+					<span>All Contacts</span>
+				</a>
+				<a class="active" href="/profile">
+					<i class="bi bi-person-circle"></i>
+					<span>Profile</span>
+				</a>
+				<a href="/group/archived">
+					<i class="bi bi-archive"></i>
+					<span>Archived</span>
+				</a>
+				<a href="/group/favourites">
+					<i class="bi bi-heart"></i>
+					<span>Favourites</span>
+				</a>
+				<a href="/categories">
+					<i class="bi bi-tags"></i>
+					<span>Categories</span>
+				</a>
+				<a href="logout" class="logout">
+					<i class="bi bi-box-arrow-right"></i>
+					<span>Logout</span>
+				</a>
+			</nav>
 		</div>
-		<div class="mycontainer">
-			<div class="emails">
-				<h3>Emails</h3>
-
-				<table>
-					<thead>
-						<tr>
-							<th>Email_id</th>
-							<th>Primary</th>
-						</tr>
-					</thead>
-					<tbody>
-
-						<%
-					List<Email> emails = user.getEmails();
-											if (emails != null && !emails.isEmpty()) {
-												for (Email i : emails) {
-													out.println("<tr>");
-													out.println("<td>" + i.getEmail() + "</td>");
-													out.println("<td>");
-													String endPoint = String.format("email/%d/%d/%d?action=changePrimary",user.getUserId(),user.getPrimaryEmailId(),i.getId());
-													out.println("    <form action='"+ endPoint +"' method='post' style='display:inline;'>");
-													out.println(
-													"        <button type='submit' class='btn btn-warning' title='primary email' onclick='return confirm(\"Are you sure you want to change this as primary?\");'>");
-													out.println(
-													i.getIsPrimary() == 1 ? " <img src='"+request.getContextPath()+"/styles/star.svg' alt='Star Icon' style='width: 20px; height: 20px;'"
-															: "<img src='"+request.getContextPath()+"/styles/transparentstar.svg' alt='Star Icon' style='width: 20px; height: 20px;'");
-													out.println("        </button>");
-													out.println("    </form>");
-													out.println("</td>");
-													out.println("</tr>");
-												}
-											} else {
-												out.println("<tr><td colspan='4'>No emails found.</td></tr>");
-											}
-					%>
-					</tbody>
-				</table>
-
-				<%
-			String result = (String) request.getAttribute("result");
-					if (result != null)
-						out.println(result);
-			%>
-
-				<button type="button" class="mybutton mt-2" data-bs-toggle="modal"
-					data-bs-target="#exampleModal">Add new Email</button>
-
-
-				<div class="modal fade" id="exampleModal" tabindex="-1"
-					aria-labelledby="exampleModalLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h1 class="modal-title fs-5" id="exampleModalLabel">Add new
-									email</h1>
-								<button type="button" class="btn-close" data-bs-dismiss="modal"
-									aria-label="Close"></button>
+		
+		<%
+			User user = (User)request.getAttribute("user");
+			List<OAuthToken> oAuthTokens = (List<OAuthToken>)request.getAttribute("oAuthTokens");
+		%>
+		
+		<div class="content">
+			<div class="dashboard-header">
+				<div>
+					<h1 class="welcome-heading">User Profile</h1>
+					<p class="welcome-subtitle">Manage your personal information and account settings</p>
+				</div>
+			</div>
+			
+			<div class="profile-grid">
+				<!-- Profile Card -->
+				<div class="card profile-card">
+					<div class="card-header">
+						<h3><i class="bi bi-person-badge"></i> Personal Information</h3>
+					</div>
+					<div class="card-body text-center">
+						<div class="profile-avatar-container">
+							<img class="profile-avatar" alt="profile-img"
+								src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541">
+							<div class="profile-badge">
+								<i class="bi bi-pencil-fill"></i>
 							</div>
-							<div class="modal-body">
-								<div class="container">
-									<form action="/email/<%=user.getUserId()%>?action=add"
-										method="post">
-										<div class="form-group">
-											<label for="email">Email:</label> <input type="email"
-												id="email" name="email" required>
-										</div>
-										<!--  <input type="hidden" name="user_id"
-										value="<%=user.getUserId()%>">-->
-										<input type="submit" class="mybutton mt-1" value="Add Email">
-									</form>
-
+						</div>
+						
+						<h4 class="profile-name"><%=user.getFirstName() + " " + user.getLastName()%></h4>
+						
+						<div class="profile-details">
+							<div class="profile-detail-item">
+								<div class="detail-icon"><i class="bi bi-person-vcard"></i></div>
+								<div class="detail-content">
+									<span class="detail-label">User ID</span>
+									<span class="detail-value"><%=user.getUserId()%></span>
+								</div>
+							</div>
+							
+							<div class="profile-detail-item">
+								<div class="detail-icon"><i class="bi bi-calendar3"></i></div>
+								<div class="detail-content">
+									<span class="detail-label">Age</span>
+									<span class="detail-value"><%=user.getAge()%></span>
+								</div>
+							</div>
+							
+							<div class="profile-detail-item">
+								<div class="detail-icon"><i class="bi bi-geo-alt"></i></div>
+								<div class="detail-content">
+									<span class="detail-label">Address</span>
+									<span class="detail-value"><%=user.getAddress()%></span>
+								</div>
+							</div>
+							
+							<div class="profile-detail-item">
+								<div class="detail-icon"><i class="bi bi-telephone"></i></div>
+								<div class="detail-content">
+									<span class="detail-label">Phone</span>
+									<span class="detail-value"><%=user.getPhone()%></span>
 								</div>
 							</div>
 						</div>
+						
+						<div class="profile-actions">
+							<button class="mybutton">
+								<i class="bi bi-pencil-square"></i> Edit Profile
+							</button>
+							<form action="googleLogin" style="display: inline-block;">
+								<button type="submit" class="mybutton import-button">
+									<i class="bi bi-google"></i> Import from Google
+								</button>
+							</form>
+						</div>
 					</div>
 				</div>
-
-
-
-			</div>
-		</div>
-		<div class="mycontainer">
-			<div class="sync-settings">
-				<h4>Google Sync Settings</h4>
-				<%
-				for (OAuthToken token : oAuthTokens) {
-				%>
-				<div class="sync-item">
-					<form
-						action="/profile?tokenId=<%=token.getId()%>&action=updateSyncInterval"
-						method="post">
-						<div class="form-group">
-							<label><%=token.getEmail()%>:
-							</label> <select name="syncInterval" class="form-select">
-								<option value="0"
-									<%=token.getSyncInterval() == 0 ? "selected" : ""%>>No
-									Sync</option>
-								<option value="60"
-									<%=token.getSyncInterval() == 60 ? "selected" : ""%>>1
-									Hour</option>
-								<option value="300"
-									<%=token.getSyncInterval() == 300 ? "selected" : ""%>>5
-									Hours</option>
-								<option value="600"
-									<%=token.getSyncInterval() == 600 ? "selected" : ""%>>10
-									Hours</option>
-								<option value="2880"
-									<%=token.getSyncInterval() == 2880 ? "selected" : ""%>>2
-									Days</option>
-							</select>
+				
+				<!-- Email Card -->
+				<div class="card email-card">
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<h3><i class="bi bi-envelope"></i> Email Addresses</h3>
+						<button type="button" class="mybutton add-email-btn" data-bs-toggle="modal"
+							data-bs-target="#exampleModal">
+							<i class="bi bi-plus-circle"></i> Add Email
+						</button>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th>Email Address</th>
+										<th class="text-center">Primary</th>
+										<th class="text-center">Delete</th>
+										
+									</tr>
+								</thead>
+								<tbody>
+									<%
+									List<Email> emails = user.getEmails();
+									if (emails != null && !emails.isEmpty()) {
+										for (Email email : emails) {
+									%>
+									<tr>
+										<td class="email-address"><%=email.getEmail()%></td>
+										<td class="text-center">
+											<form action="email/<%=user.getPrimaryEmailId()%>/<%=email.getId()%>?action=changePrimary" 
+												method="post" style="display:inline;">
+												<button type="submit" class="btn btn-star <%= email.getIsPrimary() == 1 ? "active" : "" %>" 
+													title="Set as primary email" 
+													onclick="return confirm('Are you sure you want to set this as your primary email?');">
+													<i class="bi <%= email.getIsPrimary() == 1 ? "bi-star-fill" : "bi-star" %>"></i>
+												</button>
+											</form>
+										</td>
+										<td class="text-center">
+										<% if(email.getIsPrimary() != 1){ %>
+											<form action="email/<%= email.getId() %>?action=delete" method="post">
+                                                        <button type="submit" class="btn-icon text-danger" title="Delete email" style="border:none">
+                                                            <i class="bi bi-trash-fill"></i>
+                                                        </button>
+                                             </form>
+                                         <%} else { %>
+                                         <button type="submit" class="disabled" title="Delete email" style="border:none">
+                                                            <i class="bi bi-trash-fill"></i>
+                                                        </button>
+                                         <%} %>
+										</td>
+									</tr>
+									<%
+										}
+									} else {
+									%>
+									<tr>
+										<td colspan="2">
+											<div class="empty-state">
+												<i class="bi bi-envelope-x empty-icon"></i>
+												<p>No email addresses found. Add your first email address to get started!</p>
+											</div>
+										</td>
+									</tr>
+									<%
+									}
+									%>
+								</tbody>
+							</table>
 						</div>
-						<button type="submit" class="btn btn-sm btn-primary">Update</button>
-					</form>
+						
+						<%
+						String result = (String) request.getAttribute("result");
+						if (result != null) {
+						%>
+						<div class="alert alert-success alert-dismissible fade show" role="alert">
+							<%=result%>
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+						</div>
+						<%
+						}
+						%>
+					</div>
 				</div>
-				<%
-				}
-				%>
+				
+				<!-- Sync Settings Card -->
+				<div class="card sync-card">
+					<div class="card-header">
+						<h3><i class="bi bi-cloud-sync"></i> Google Sync Settings</h3>
+					</div>
+					<div class="card-body">
+						<% if (oAuthTokens != null && !oAuthTokens.isEmpty()) { %>
+							<% for (OAuthToken token : oAuthTokens) { %>
+							<div class="sync-item">
+								<div class="sync-email">
+									<i class="bi bi-google"></i>
+									<%=token.getEmail()%>
+								</div>
+								<form action="/profile?tokenId=<%=token.getId()%>&action=updateSyncInterval"
+									method="post" class="sync-form">
+									<div class="form-group">
+										<select name="syncInterval" class="form-select">
+											<option value="0" <%=token.getSyncInterval() == 0 ? "selected" : ""%>>No Sync</option>
+											<option value="60" <%=token.getSyncInterval() == 60 ? "selected" : ""%>>1 Hour</option>
+											<option value="300" <%=token.getSyncInterval() == 300 ? "selected" : ""%>>5 Hours</option>
+											<option value="600" <%=token.getSyncInterval() == 600 ? "selected" : ""%>>10 Hours</option>
+											<option value="2880" <%=token.getSyncInterval() == 2880 ? "selected" : ""%>>2 Days</option>
+										</select>
+									</div>
+									<button type="submit" class="mybutton sync-button">
+										<i class="bi bi-arrow-repeat"></i> Update
+									</button>
+								</form>
+							</div>
+							<% } %>
+						<% } else { %>
+							<div class="empty-state">
+								<i class="bi bi-cloud-slash empty-icon"></i>
+								<p>No Google accounts connected. Connect your Google account to sync contacts.</p>
+							</div>
+						<% } %>
+					</div>
+				</div>
 			</div>
-
+			
+			<!-- Add Email Modal -->
+			<div class="modal fade" id="exampleModal" tabindex="-1"
+				aria-labelledby="exampleModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h1 class="modal-title fs-5" id="exampleModalLabel">
+								<i class="bi bi-envelope-plus"></i> Add New Email
+							</h1>
+							<button type="button" class="btn-close" data-bs-dismiss="modal"
+								aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<form action="/email/<%=user.getUserId()%>?action=add" method="post">
+								<div class="form-group mb-4">
+									<label for="email" class="form-label">
+										<i class="bi bi-envelope"></i> Email Address:
+									</label>
+									<input type="email" class="form-control" id="email" name="email"
+										placeholder="Enter your email address" required>
+								</div>
+								<div class="d-grid">
+									<button type="submit" class="mybutton btn-lg">
+										<i class="bi bi-plus-circle"></i> Add Email
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </body>

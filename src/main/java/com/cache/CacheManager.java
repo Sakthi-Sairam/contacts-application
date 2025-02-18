@@ -21,15 +21,15 @@ public class CacheManager<K, V> {
         return cache.get(key);
     }
 
-    public void put(K key, V value) {
+    public synchronized void put(K key, V value) {
         cache.put(key, value);
     }
 
-    public V remove(K key) {
+    public synchronized V remove(K key) {
         return cache.remove(key);
     }
 
-    public void clear() {
+    public synchronized void clear() {
         cache.clear();
     }
 
@@ -38,7 +38,7 @@ public class CacheManager<K, V> {
         return cache.toString();
     }
 
-	public void putIfAbsent(K key, V value) {
+	public synchronized void putIfAbsent(K key, V value) {
 		cache.putIfAbsent(key,value);
 	}
 

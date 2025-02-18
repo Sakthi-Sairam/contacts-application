@@ -2,9 +2,7 @@ package com.managers;
 
 import java.util.List;
 import java.util.concurrent.*;
-
 import org.json.JSONObject;
-
 import com.exceptions.DaoException;
 import com.models.OAuthToken;
 import com.oauth.OAuthDao;
@@ -13,74 +11,52 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class OAuthManager {
-
-    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private static final ExecutorService workerPool = Executors.newFixedThreadPool(5);
     private static final Logger LOGGER = Logger.getLogger(OAuthManager.class.getName());
+    
+    public static final Runnable oauthScheduledTask = () -> {
+        LOGGER.info("OAuthManager scheduler execution started");
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+        
+        try {
+            List<OAuthToken> tokens = OAuthDao.getAllOAuthTokens();
+            long currentTime = System.currentTimeMillis();
 
-    public static void startScheduler() {
-        LOGGER.info("Starting OAuth token refresh scheduler");
-
-        scheduler.scheduleAtFixedRate(() -> {
-//            LOGGER.info("OAuthManager scheduler execution started");
-
-            try {
-                List<OAuthToken> tokens = OAuthDao.getAllOAuthTokens();
-                long currentTime = System.currentTimeMillis();
-                
-                for (OAuthToken token : tokens) {
-                	if(token.getSyncInterval()==0) {
-                		continue;
-                	}
-                    long timeSinceLastSync = currentTime - token.getLastSync();
-                    long requiredInterval = token.getSyncInterval() * 60000;
+            for (OAuthToken token : tokens) {
+                if (token.getSyncInterval() > 0 && 
+                    (currentTime - token.getLastSync()) >= token.getSyncInterval() * 60000) {
                     
-                    if (timeSinceLastSync >= requiredInterval) {
-                        workerPool.execute(() -> {
-                            processToken(token);
-                            try {
-								OAuthDao.updateLastSync(token.getId());
-							} catch (DaoException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-                        });
-                    }
+                    executorService.execute(() -> {
+                        processToken(token);
+                        try {
+                            OAuthDao.updateLastSync(token.getId());
+                        } catch (DaoException e) {
+                            LOGGER.log(Level.SEVERE, "Error updating sync for token: " + token.getId(), e);
+                        }
+                    });
                 }
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error in sync scheduler", e);
             }
-
-//            LOGGER.info("OAuthManager scheduler execution completed");
-        }, 1, 5, TimeUnit.MINUTES);
-    }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error in OAuth sync process", e);
+        } finally {
+            executorService.shutdown();
+            try {
+                executorService.awaitTermination(30, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                executorService.shutdownNow();
+            }
+            LOGGER.info("OAuthManager scheduler completed");
+        }
+    };
 
     private static void processToken(OAuthToken token) {
         try {
             JSONObject res = OAuthService.getAccessTokenWithRefreshToken(token.getRefreshToken());
             String accessToken = res.optString("access_token", null);
-            if (accessToken == null) return;
-            OAuthService.syncContacts(accessToken, token.getUserId());
+            if (accessToken != null) {
+                OAuthService.syncContacts(accessToken, token.getUserId());
+            }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error processing OAuth token for user: " + token.getUserId(), e);
-        }
-    }
-
-    public static void stopScheduler() {
-        try {
-            LOGGER.info("Shutting down OAuthManager scheduler...");
-            scheduler.shutdown();
-            workerPool.shutdown();
-            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
-                scheduler.shutdownNow();
-            }
-            if (!workerPool.awaitTermination(5, TimeUnit.SECONDS)) {
-                workerPool.shutdownNow();
-            }
-            LOGGER.info("OAuthManager scheduler shut down successfully");
-        } catch (InterruptedException e) {
-            LOGGER.log(Level.SEVERE, "Error shutting down OAuthManager scheduler", e);
-            Thread.currentThread().interrupt();
+            LOGGER.log(Level.SEVERE, "Error processing token for user: " + token.getUserId(), e);
         }
     }
 }

@@ -34,7 +34,13 @@ public class ExceptionHandlerUtil {
 		if (e != null) {
 			e.printStackTrace();
 		}
-		forwardToView(request, response, message, view);
+//		forwardToView(request, response, message, view);
+		try {
+			response.sendRedirect(view+"?errorMessage="+message);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 
 	private static void forwardToView(HttpServletRequest request, HttpServletResponse response, String message, String view) {

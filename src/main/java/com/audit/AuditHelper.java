@@ -1,7 +1,6 @@
 package com.audit;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
@@ -89,8 +88,9 @@ public class AuditHelper {
             for (Field field : oldDataModel.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
                 Object oldValue = field.get(oldDataModel);
-                String columnName = field.getAnnotation(com.models.Column.class).name();
-                
+                com.models.Column column = field.getAnnotation(com.models.Column.class);
+                if(column == null) continue;
+                String columnName = column.name();
                 if(columnName.equals(primaryKeyColumn.toString())){
                 	newDataUpdatedFields.put(columnName, oldValue);
                     oldDataUpdatedFields.put(columnName, oldValue);
@@ -105,7 +105,6 @@ public class AuditHelper {
             e.printStackTrace();
         }
 
-//        return recordId;
     }
 
 

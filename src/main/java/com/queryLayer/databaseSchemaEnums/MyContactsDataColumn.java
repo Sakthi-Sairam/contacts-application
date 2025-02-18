@@ -6,9 +6,7 @@ package com.queryLayer.databaseSchemaEnums;
 public enum MyContactsDataColumn implements Column {
     MY_CONTACTS_ID("MyContactsID"),
     USER_ID("user_id"),
-    FRIEND_EMAIL("friend_email"),
     ALIAS_FND_NAME("alias_fnd_name"),
-    PHONE("phone"),
     ADDRESS("address"),
     IS_ARCHIVED("isArchived"),
     IS_FAVORITE("isFavorite"),
