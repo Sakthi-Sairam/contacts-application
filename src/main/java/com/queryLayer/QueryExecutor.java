@@ -93,7 +93,8 @@ public class QueryExecutor {
 			return rowCount;
 		} catch (SQLException e) {
 			try {
-				connection.rollback();
+				if(isTransaction)
+					connection.rollback();
 			} catch (SQLException rollbackEx) {
 				throw new QueryExecutorException(ErrorCode.DATABASE_ERROR, "Rollback failed", rollbackEx);
 			}
@@ -152,23 +153,10 @@ public class QueryExecutor {
 		}
 	}
 
-	public void executeTransaction(List<QueryBuilder> sqlQueries) throws QueryExecutorException {
-		transactionStart();
-		try {
-			for (QueryBuilder query : sqlQueries) {
-				executeUpdate(query);
-			}
-			transactionEnd();
-		} finally {
-			isTransaction = false;
-			closeConnection();
-		}
-	}
-
 	/**
 	 * Executes an Select query and returns the respective model (POJO).
 	 * 
-	 * @param query QueryBuilder object containing the INSERT query
+	 * @param query QueryBuilder object 
 	 * @param clazz class of the model
 	 * @return model reference
 	 * @throws QueryExecutorException if query execution fails
@@ -177,8 +165,8 @@ public class QueryExecutor {
 			throws QueryExecutorException {
 		try {
 			String sql = query.build();
-			System.out.println("Executing SQL: " + sql);
-			System.out.println(query.query.getQueryParams());
+//			System.out.println("Executing SQL: " + sql);
+//			System.out.println(query.query.getQueryParams());
 
 			if (!isTransaction) {
 				connection = getConnection();
@@ -346,6 +334,7 @@ public class QueryExecutor {
 				}
 
 				if (populated) {
+					@SuppressWarnings("unchecked")
 					List<Object> nestedList = (List<Object>) field.get(instance);
 					if (nestedList == null) {
 						nestedList = new ArrayList<>();

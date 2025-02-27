@@ -1,14 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-    
+pageEncoding="UTF-8"%>
+
 <%@ page session="false" %>
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Login</title>
-    
-    <link rel="stylesheet" type="text/css" href="./styles/login.css">
-    <style type="text/css">
+    <head>
+        <title>Login</title>
+
+        <link rel="stylesheet" type="text/css" href="./styles/login.css">
+        <style type="text/css">
     body {
     font-family: "Lato", sans-serif;
     display: flex;
@@ -70,27 +70,29 @@ a{
 }
     
     </style>
-    
-</head>
-<body>
-    <div class="container">
-        <h2 class="title">Login Page</h2>
-        <form class="login-form" action="login" method="post">
-            <label for="email">Email</label>
-            <input type="text" name="email" id="email" class="input-field" required>
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" class="input-field" required>
-            <input type="submit" value="Login" class="btn">
-            <a href="register">Not have account?</a>
-            <%
-            String errmsg = (String) request.getAttribute("errorMessage");
-            if(errmsg!=null) out.println(errmsg);
-            %>
-        </form>
-        <!-- 
+
+    </head>
+    <body>
+        <div class="container">
+            <h2 class="title">Login Page</h2>
+            <form class="login-form" action="login" method="post">
+                <label for="email">Email</label>
+                <input type="text" name="email" id="email" class="input-field"
+                    required>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password"
+                    class="input-field" required>
+                <input type="submit" value="Login" class="btn">
+                <a href="register">Not have account?</a>
+                <%
+                String errmsg = (String) request.getAttribute("errorMessage");
+                if(errmsg!=null) out.println(errmsg);
+                %>
+            </form>
+            <!-- 
         <form action="googleLogin">
         <input type="submit" value="sign up with google" class="btn">
         </form>  -->
-    </div>
-</body>
+        </div>
+    </body>
 </html>

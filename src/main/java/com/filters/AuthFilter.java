@@ -1,7 +1,6 @@
 package com.filters;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,188 +17,201 @@ import com.managers.SessionManager;
 import com.models.Session;
 import com.models.User;
 
-@WebFilter(urlPatterns = { "/*" }, filterName = "SessionFilter")
 public class AuthFilter implements Filter {
-	private static final ThreadLocal<User> threadLocalSession = new ThreadLocal<>();
-	private static final Logger LOGGER = Logger.getLogger(AuthFilter.class.getName());
-	private static final Logger ACCESS_LOGGER = Logger.getLogger("AccessLog");
+    private static final ThreadLocal<User> THREAD_LOCAL_USER = new ThreadLocal<>();
+    private static final Logger LOGGER = Logger.getLogger(AuthFilter.class.getName());
+    private static final Logger ACCESS_LOGGER = Logger.getLogger("AccessLog");
+    private static final String SESSION_COOKIE_NAME = "s-id";
+    private static final String LOGIN_PATH = "/login";
+    private static final long MILLIS_PER_MINUTE = 60000L;
 
-	static {
-		try {
-			// Configure Access Log
-			FileHandler accessFileHandler = new FileHandler(
-					"/home/sakthi-pt7694/Desktop/jeeProjects1/contactsLogs/access.log", true);
-			accessFileHandler.setFormatter(new SimpleFormatter());
-			ACCESS_LOGGER.addHandler(accessFileHandler);
-			ACCESS_LOGGER.setUseParentHandlers(false);
+    static {
+        try {
+            // Configure Access Log
+            FileHandler accessFileHandler = new FileHandler(
+                    "/home/sakthi-pt7694/Desktop/jeeProjects1/contactsLogs/access.log", true);
+            accessFileHandler.setFormatter(new SimpleFormatter());
+            ACCESS_LOGGER.addHandler(accessFileHandler);
+            ACCESS_LOGGER.setUseParentHandlers(false);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to configure access logger", e);
+        }
+    }
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        String requestURI = httpRequest.getRequestURI();
 
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
+        LOGGER.fine("Processing request: " + requestURI);
 
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		HttpServletResponse httpResponse = (HttpServletResponse) response;
+        try {
+            // Check for excluded paths
+            if (isExcludedPath(requestURI)) {
+                chain.doFilter(request, response);
+                return;
+            }
 
-		String requestURI = httpRequest.getRequestURI();
-		String queryString = httpRequest.getQueryString();
-		String requestURL = httpRequest.getRequestURL().toString() + (queryString != null ? "?" + queryString : "");
+            // Handle login/registration pages
+            if (isLoginOrRegistrationPage(requestURI)) {
+                handleLoginPage(httpRequest, httpResponse, chain);
+                return;
+            }
 
-		LOGGER.fine("Processing request: " + requestURI);
+            // Process session
+            String sessionId = getSessionIdFromCookies(httpRequest.getCookies());
+            if (sessionId == null) {
+                LOGGER.warning("No session ID found, redirecting to login");
+                httpResponse.sendRedirect(LOGIN_PATH);
+                return;
+            }
 
-		// Path to exclude
-		if (requestURI.endsWith("invalidatecache") || requestURI.endsWith("server-cache-sync")) {
-			LOGGER.info("Skipping session validation for: " + requestURI);
-			chain.doFilter(request, response);
-			return;
-		}
+            // Log access
+            logAccessDetails(httpRequest, sessionId);
 
-		if (isLoginOrRegistrationPage(requestURI)) {
-			handleLoginPage(httpRequest, httpResponse, chain);
-			return;
-		}
+            // Validate session
+            if (!validateAndProcessSession(httpResponse, sessionId)) {
+                return;
+            }
 
-		// Extract and validate session
-		String sessionId = getSessionIdFromCookies(httpRequest.getCookies());
-		if (sessionId == null) {
-			LOGGER.warning("No session ID found, redirecting to login");
-			httpResponse.sendRedirect("/login");
-			return;
-		}
+            // Continue with request processing
+            request.setAttribute("sessionId", sessionId);
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error processing request", e);
+            httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Request processing error");
+        } finally {
+            THREAD_LOCAL_USER.remove();
+        }
+    }
 
+    private boolean isExcludedPath(String requestURI) {
+        return requestURI.endsWith("invalidatecache") || requestURI.endsWith("server-cache-sync") || requestURI.endsWith("error.jsp");
+    }
 
-		logAccessDetails(requestURL, sessionId, httpRequest);
+    private boolean isLoginOrRegistrationPage(String requestURI) {
+        return requestURI.endsWith("login.jsp") || requestURI.endsWith("register.jsp") 
+               || requestURI.endsWith("login") || requestURI.endsWith("register");
+    }
 
-		if (!validateAndProcessSession(httpRequest, httpResponse, sessionId)) {
-			return;
-		}
+    private void handleLoginPage(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain)
+            throws IOException, ServletException {
+        String sessionId = getSessionIdFromCookies(httpRequest.getCookies());
 
-		try {
-			request.setAttribute("sessionId", sessionId);
-			chain.doFilter(request, response);
-		} catch (Exception e) {
-			LOGGER.log(Level.SEVERE, "Error processing request", e);
-			httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Request processing error");
-		} finally {
-			threadLocalSession.remove();
-		}
-	}
+        // Check if user has a valid session
+        if (sessionId != null && isSessionValid(sessionId)) {
+            LOGGER.info("Active session found, redirecting to dashboard");
+            httpResponse.sendRedirect("/contacts");
+            return;
+        }
 
-	// Clear all session-related cookies
-	private void clearSessionAndCookies(HttpServletResponse response) {
-		Cookie sessionCookie = new Cookie("s-id", "");
-		sessionCookie.setMaxAge(0);
-		sessionCookie.setPath("/");
-		response.addCookie(sessionCookie);
-	}
+        chain.doFilter(httpRequest, httpResponse);
+    }
 
-	private boolean isLoginOrRegistrationPage(String requestURI) {
-		return requestURI.endsWith("login.jsp") || requestURI.endsWith("register.jsp") || requestURI.endsWith("login")
-				|| requestURI.endsWith("register");
-	}
+    private boolean isSessionValid(String sessionId) {
+        Session session = SessionManager.getSession(sessionId);
+        if (session == null) {
+            return false;
+        }
+        
+        long now = System.currentTimeMillis();
+        return session.getLastAccessedTime() + SessionManager.TIMEOUT_MINUTES * MILLIS_PER_MINUTE >= now;
+    }
 
-	private void handleLoginPage(HttpServletRequest httpRequest, HttpServletResponse httpResponse, FilterChain chain)
-			throws IOException, ServletException {
-		String sessionId = getSessionIdFromCookies(httpRequest.getCookies());
+    private boolean validateAndProcessSession(HttpServletResponse httpResponse, String sessionId) throws IOException {
+        Session storedSession = SessionManager.getSession(sessionId);
 
-		// Check if session exists and is valid
-		if (sessionId != null) {
-			Session session = SessionManager.getSession(sessionId);
+        if (storedSession == null) {
+            LOGGER.warning("No session found for ID: " + sessionId);
+            redirectToLogin(httpResponse);
+            return false;
+        }
 
-			// Validate session time
-			if (session != null) {
-				long now = System.currentTimeMillis();
-				if (session.getLastAccessedTime() + SessionManager.TIMEOUT_MINUTES * 60000L >= now) {
-					LOGGER.info("Active session found, redirecting to dashboard");
-					httpResponse.sendRedirect("/contacts");
-					return;
-				}
-			}
-		}
+        long lastAccessedTime = storedSession.getLastAccessedTime();
+        long now = System.currentTimeMillis();
+        long timeoutMillis = SessionManager.TIMEOUT_MINUTES * MILLIS_PER_MINUTE;
 
-		chain.doFilter(httpRequest, httpResponse);
-	}
+        // Check session timeout
+        if (lastAccessedTime + timeoutMillis < now) {
+            LOGGER.info("Session expired for ID: " + sessionId);
+            SessionManager.removeSession(sessionId);
+            redirectToLogin(httpResponse);
+            return false;
+        }
 
-	private boolean validateAndProcessSession(HttpServletRequest httpRequest, HttpServletResponse httpResponse,
-			String sessionId) throws IOException {
-		
-		Session storedSession = SessionManager.getSession(sessionId);
+        // Update session and ensure user is cached
+        int userId = storedSession.getUserId();
+        SessionManager.updateSession(sessionId, userId);
+        ensureUserCached(userId);
+        
+        THREAD_LOCAL_USER.set(SessionManager.getUser(userId));
+        return true;
+    }
 
-		if (storedSession == null) {
-			LOGGER.warning("No session found for ID: " + sessionId);
-			httpResponse.sendRedirect("/login");
-			return false;
-		}
+    private void ensureUserCached(int userId) {
+        if (!SessionManager.userMap.containsKey(userId)) {
+            try {
+                User user = UserDao.getUserById(userId);
+                if (user != null) {
+                    SessionManager.userMap.put(userId, user);
+                }
+            } catch (DaoException e) {
+                LOGGER.log(Level.SEVERE, "Error retrieving user data", e);
+            }
+        }
+    }
 
-		long lastAccessedTime = storedSession.getLastAccessedTime();
-		long now = System.currentTimeMillis();
-		long timeoutMillis = SessionManager.TIMEOUT_MINUTES * 60000L;
+    private void redirectToLogin(HttpServletResponse response) throws IOException {
+        response.sendRedirect(LOGIN_PATH);
+    }
 
-		// Check session timeout
-		if (lastAccessedTime + timeoutMillis < now) {
-			LOGGER.info("Session expired for ID: " + sessionId);
+//    private void clearSessionCookie(HttpServletResponse response) {
+//        Cookie sessionCookie = new Cookie(SESSION_COOKIE_NAME, "");
+//        sessionCookie.setMaxAge(0);
+//        sessionCookie.setPath("/");
+//        response.addCookie(sessionCookie);
+//    }
 
-			// Remove session from manager and clear cookie
-			SessionManager.removeSession(sessionId);
-//			clearSessionAndCookies(httpResponse);
+    private void logAccessDetails(HttpServletRequest request, String sessionId) {
+        StringBuilder requestURI = new StringBuilder(request.getRequestURL().toString());
+        String queryString = request.getQueryString();
+        if (queryString != null) {
+            requestURI.append("?").append(queryString);
+        }
+        
+        String clientIP = request.getRemoteAddr();
+        String method = request.getMethod();
 
-			httpResponse.sendRedirect("/login");
-			return false;
-		}
+        ACCESS_LOGGER.info(String.format("Method: %s | URI: %s | IP: %s | Session ID: %s | Time: %d", 
+                method, requestURI.toString(), clientIP, sessionId, System.currentTimeMillis()));
+    }
 
-		// Update session and user cache
-		int userId = storedSession.getUserId();
-		SessionManager.updateSession(sessionId, userId);
+    public static String getSessionIdFromCookies(Cookie[] cookies) {
+        if (cookies == null) {
+            return null;
+        }
+        
+        for (Cookie cookie : cookies) {
+            if (SESSION_COOKIE_NAME.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
 
-		if (!SessionManager.userMap.containsKey(userId)) {
-			User user = null;
-			try {
-				user = UserDao.getUserById(userId);
-			} catch (DaoException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			SessionManager.userMap.put(userId, user);
-		}
+    @Override
+    public void destroy() {
+        THREAD_LOCAL_USER.remove();
+    }
 
-		threadLocalSession.set(SessionManager.getUser(userId));
-		return true;
-	}
+    public static User getCurrentUser() {
+        return THREAD_LOCAL_USER.get();
+    }
 
-	private void logAccessDetails(String requestURI, String sessionId, HttpServletRequest request) {
-		String clientIP = request.getRemoteAddr();
-		String method = request.getMethod();
-
-		ACCESS_LOGGER.info(String.format("Method: %s | URI: %s | IP: %s | Session ID: %s | Time: %d", method,
-				requestURI, clientIP, sessionId, System.currentTimeMillis()));
-	}
-
-	public static String getSessionIdFromCookies(Cookie[] cookies) {
-		if (cookies != null) {
-			for (Cookie cookie : cookies) {
-				if ("s-id".equals(cookie.getName())) {
-					return cookie.getValue();
-				}
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public void destroy() {
-		threadLocalSession.remove();
-	}
-
-	public static User getCurrentUser() {
-		return threadLocalSession.get();
-	}
-
-	public static void setCurrentUser(User user) {
-		threadLocalSession.remove();
-		threadLocalSession.set(user);
-	}
+    public static void setCurrentUser(User user) {
+        THREAD_LOCAL_USER.remove();
+        THREAD_LOCAL_USER.set(user);
+    }
 }

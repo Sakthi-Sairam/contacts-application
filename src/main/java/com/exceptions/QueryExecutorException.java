@@ -1,9 +1,5 @@
 package com.exceptions;
 
-import java.sql.SQLException;
-
-import com.mysql.cj.protocol.Message;
-
 public class QueryExecutorException extends Exception{
 	private static final long serialVersionUID = 1L;
 	private ErrorCode code;

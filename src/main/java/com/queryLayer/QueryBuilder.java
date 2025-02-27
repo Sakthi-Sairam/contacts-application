@@ -95,6 +95,10 @@ public class QueryBuilder {
 		query.appendQueryString(" AND ");
 		return this;
 	}
+	public QueryBuilder or() {
+		query.appendQueryString(" OR ");
+		return this;
+	}
 
 	public QueryBuilder join(Table table, Column foreignKey1, Column foreignKey2) {
 		String queryString = String.format(" JOIN %s ON %s = %s", table.getTableName(), foreignKey1.toString(),

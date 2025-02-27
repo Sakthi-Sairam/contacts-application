@@ -44,4 +44,26 @@ public class UserProfileHandler {
             ExceptionHandlerUtil.logAndForwardServerException(request, response, e, UserProfileHandler.class);
         }
     }
+
+	public static void handleUpdateProfile(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+        	String firstName = request.getParameter("firstName");
+            String lastName = request.getParameter("lastName");
+            String age = request.getParameter("age");
+            String address = request.getParameter("address");
+            int userId = AuthFilter.getCurrentUser().getUserId();
+            System.out.println(firstName+"::"+lastName+"::"+age+"::"+address+"::"+userId);
+            
+            boolean isSuccess = UserDao.updateProfile(firstName, lastName, age, address, userId);
+
+            if (isSuccess) {
+                response.sendRedirect("/profile?action=refresh");
+            } else {
+                ExceptionHandlerUtil.logAndForwardClientException(request, response, "Failed to edit contact.", null, "/contacts", ContactsHandler.class);
+            }
+        } catch (DaoException e) {
+            ExceptionHandlerUtil.logAndForwardServerException(request, response, e, UserProfileHandler.class);
+        }
+		
+	}
 }

@@ -13,6 +13,14 @@
     <servlet-name>default</servlet-name>
     <url-pattern>/styles/*</url-pattern>
   </servlet-mapping>
+  <filter>
+    <filter-name>AuthFilter</filter-name>
+    <filter-class>com.filters.AuthFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>AuthFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
   <servlet>
     <servlet-name>LoginServlet</servlet-name>
     <servlet-class>com.servlets.LoginServlet</servlet-class>
@@ -28,5 +36,87 @@
   <servlet-mapping>
     <servlet-name>LogoutServlet</servlet-name>
     <url-pattern>/logout</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>CategoryController</servlet-name>
+    <servlet-class>com.servlets.CategoryController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CategoryController</servlet-name>
+    <url-pattern>/categories/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ContactsController</servlet-name>
+    <servlet-class>com.servlets.ContactsController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ContactsController</servlet-name>
+    <url-pattern>/contacts/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ContactsGroupController</servlet-name>
+    <servlet-class>com.servlets.ContactsGroupController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ContactsGroupController</servlet-name>
+    <url-pattern>/group/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>EmailController</servlet-name>
+    <servlet-class>com.servlets.EmailController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>EmailController</servlet-name>
+    <url-pattern>/email/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>GoogleLoginServlet</servlet-name>
+    <servlet-class>com.servlets.GoogleLoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GoogleLoginServlet</servlet-name>
+    <url-pattern>/googleLogin</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>OAuth2CallbackServlet</servlet-name>
+    <servlet-class>com.servlets.OAuth2CallbackServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OAuth2CallbackServlet</servlet-name>
+    <url-pattern>/oauth2callback</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>RegisterServlet</servlet-name>
+    <servlet-class>com.servlets.RegisterServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RegisterServlet</servlet-name>
+    <url-pattern>/register</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>UserProfileController</servlet-name>
+    <servlet-class>com.servlets.UserProfileController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UserProfileController</servlet-name>
+    <url-pattern>/profile/*</url-pattern>
+  </servlet-mapping>
+  <error-page>
+    <error-code>500</error-code>
+    <location>/error.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/error.jsp</location>
+  </error-page>
+  <servlet>
+    <description></description>
+    <display-name>MergeContactsServlet</display-name>
+    <servlet-name>MergeContactsServlet</servlet-name>
+    <servlet-class>com.servlets.MergeContactsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MergeContactsServlet</servlet-name>
+    <url-pattern>/MergeContactsServlet</url-pattern>
   </servlet-mapping>
 </web-app>

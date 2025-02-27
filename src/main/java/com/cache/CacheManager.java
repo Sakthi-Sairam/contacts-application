@@ -10,7 +10,9 @@ public class CacheManager<K, V> {
     public CacheManager(int maxSize) {
         this.maxSize = maxSize;
         this.cache = new LinkedHashMap<>(maxSize, 0.75f, true) {
-            @Override
+            private static final long serialVersionUID = 1L;
+
+			@Override
             protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
                 return size() > CacheManager.this.maxSize;
             }

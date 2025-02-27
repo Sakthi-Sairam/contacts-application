@@ -12,6 +12,7 @@ import com.models.ContactEmail;
 import com.models.User;
 import com.utils.ExceptionHandlerUtil;
 import com.utils.PathParamUtil;
+import com.utils.ValidationUtil;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -163,6 +164,10 @@ public class ContactsHandler {
 			    ExceptionHandlerUtil.logAndForwardClientException(request, response, "You cannot do that", null, "/error.jsp", ContactsHandler.class);
 			    return;
 			}
+			if(!ValidationUtil.validatePhone(phoneNumber)) {
+				ExceptionHandlerUtil.logAndForwardClientException(request, response, "Phone number is not valid", null, "/contacts/"+contactId, ContactsHandler.class);
+			    return;
+			}
 
             boolean isSuccess = ContactDao.addContactPhoneNumber(contactId, label, phoneNumber);
             if (isSuccess) {
@@ -185,6 +190,10 @@ public class ContactsHandler {
 			boolean isAuthorized = AuthorizationDao.isUserAuthorizedForCrudOnContacts(userId, contactId);
 			if(!isAuthorized) {
 			    ExceptionHandlerUtil.logAndForwardClientException(request, response, "You cannot do that", null, "/error.jsp", ContactsHandler.class);
+			    return;
+			}
+			if(!ValidationUtil.validateEmail(email)) {
+				ExceptionHandlerUtil.logAndForwardClientException(request, response, "email is not valid", null, "/contacts/"+contactId, ContactsHandler.class);
 			    return;
 			}
 

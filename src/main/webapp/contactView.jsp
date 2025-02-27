@@ -47,6 +47,7 @@
 				</a> <a href="/profile"> <i class="bi bi-person-circle"></i> <span>Profile</span>
 				</a> <a href="/group/archived"> <i class="bi bi-archive"></i> <span>Archived</span>
 				</a> <a href="/group/favourites"> <i class="bi bi-heart"></i> <span>Favourites</span>
+				</a> <a href="/merge-contacts"> <i class="bi bi-intersect me-2"></i><span>Merge Duplicates</span>
 				</a> <a href="/categories"> <i class="bi bi-tags"></i> <span>Categories</span>
 				</a> <a href="logout" class="logout"> <i
 					class="bi bi-box-arrow-right"></i> <span>Logout</span>
@@ -54,6 +55,20 @@
 			</nav>
 		</div>
 <div class="content">
+			<%
+			String errorMessage = (String) request.getParameter("errorMessage");
+			if (errorMessage != null && !errorMessage.isEmpty()) {
+			%>
+			<div class="alert alert-danger alert-dismissible fade show"
+				role="alert">
+				<i class="bi bi-exclamation-triangle-fill me-2"></i> <strong>Error:</strong>
+				<%=errorMessage%>
+				<button type="button" class="btn-close" data-bs-dismiss="alert"
+					aria-label="Close"></button>
+			</div>
+			<%
+			}
+			%>
     <div class="container mt-4">
         <div class="contact-details-container">
             <div class="contact-header">
@@ -114,9 +129,6 @@
                                                     <% } %>
                                                     <span class="contact-detail-value"><%= email.getEmail() %></span>
                                                     <div class="contact-detail-actions">
-                                                        <a href="#" class="btn-icon" title="Edit email">
-                                                            <i class="bi bi-pencil-fill"></i>
-                                                        </a>
                                                         <form action="/contacts/<%=email.getContactId()%>/<%=email.getContactEmailId()%>?action=deleteEmail" method="post">
                                                         <button type="submit" class="btn-icon text-danger" title="Delete email" style="border:none">
                                                             <i class="bi bi-trash-fill"></i>
@@ -148,9 +160,6 @@
                                                     <% } %>
                                                     <span class="contact-detail-value"><%= phone.getPhoneNumber() %></span>
                                                     <div class="contact-detail-actions">
-                                                        <a href="#" class="btn-icon" title="Edit phone">
-                                                            <i class="bi bi-pencil-fill"></i>
-                                                        </a>
                                                     <form action="/contacts/<%=phone.getContactId()%>/<%=phone.getContactNumberId()%>?action=deletePhone" method="post">
                                                         <button type="submit" class="btn-icon text-danger" title="Delete phone" style="border:none">
                                                             <i class="bi bi-trash-fill"></i>

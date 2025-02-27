@@ -4,12 +4,10 @@ import com.handlers.CategoryHandler;
 import com.utils.ExceptionHandlerUtil;
 import com.utils.PathParamUtil;
 
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/categories/*")
 public class CategoryController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

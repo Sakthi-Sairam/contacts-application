@@ -35,10 +35,9 @@ public class AuditDao {
 	public static BaseModel selectRecord(Table table, QueryBuilder sqlQuery) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, DaoException {
 		QueryBuilder qb = new QueryBuilder();
 		QueryExecutor exe = new QueryExecutor();
-        Column[] allColumns = ((Column[]) table.getColumnEnum().getMethod("values").invoke(null));
-        System.out.println("all columns are " + Arrays.toString(allColumns));
-		qb.select(allColumns)
-			.from(table);
+//        Column[] allColumns = ((Column[]) table.getColumnEnum().getMethod("values").invoke(null));
+//        System.out.println("all columns are " + Arrays.toString(allColumns));
+		qb.select(table).from(table);
 		
 	    List<Condition> conditions = sqlQuery.query.getConditions();
 	    int len = conditions.size();
@@ -51,6 +50,7 @@ public class AuditDao {
 			System.out.println("AuditDao:: "+qb.build());
 		}
 		try {
+			@SuppressWarnings("unchecked")
 			List<BaseModel> result = (List<BaseModel>) exe.executeQuery(qb, table.getModel());
 			if(result.size()==0) return null;
 			return result.get(0);

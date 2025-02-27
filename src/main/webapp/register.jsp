@@ -1,12 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Register</title>
-    
-    
-    <style>
+    <head>
+        <title>Register</title>
+
+        <style>
 body {
     font-family: "Lato", sans-serif;
     display: flex;
@@ -65,30 +64,32 @@ a{
 }
 </style>
 
-    <link rel="stylesheet" type="text/css" href="./styles/register.css">
-    
-</head>
-<body>
-<div class="container">
-    <h2 class="title">Register</h2>
-    <form action="register" method="post" class="reg-form" onsubmit="return validateForm()">
-        Email: <input type="email" name="email" required><br>
-        Password: <input type="password" name="password" required><br>
-        First Name: <input type="text" name="firstName" required><br>
-        Last Name: <input type="text" name="lastName"><br>
-        Age: <input type="number" name="age"><br>
-        Address: <input type="text" name="address"><br>
-        Phone: <input type="text" name="phone" id="phone" required><br>
-        <input type="submit" id="submit" value="Register" class="btn"><br>
-        <a href="login">Already have account?</a>
-    </form>
-        <%
-        String result = (String)request.getAttribute("result");
-        if(result!=null) out.println(result);
-    	%>
-  </div>
-  
-  <script type="text/javascript">
+        <link rel="stylesheet" type="text/css" href="./styles/register.css">
+
+    </head>
+    <body>
+        <div class="container">
+            <h2 class="title">Register</h2>
+            <form action="register" method="post" class="reg-form"
+                onsubmit="return validateForm()">
+                Email: <input type="email" name="email" required><br>
+                Password: <input type="password" name="password" required><br>
+                First Name: <input type="text" name="firstName" required><br>
+                Last Name: <input type="text" name="lastName"><br>
+                Age: <input type="number" name="age"><br>
+                Address: <input type="text" name="address"><br>
+                Phone: <input type="text" name="phone" id="phone" required><br>
+                <input type="submit" id="submit" value="Register"
+                    class="btn"><br>
+                <a href="login">Already have account?</a>
+            </form>
+            <%
+            String result = (String)request.getAttribute("result");
+            if(result!=null) out.println(result);
+            %>
+        </div>
+
+        <script type="text/javascript">
   function validateForm() {
       var phoneInput = document.getElementById("phone");
       var mobPattern = /^[1-9]{1}[0-9]{9}$/;
@@ -102,5 +103,5 @@ a{
   }
 </script>
 
-</body>
+    </body>
 </html>

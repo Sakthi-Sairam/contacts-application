@@ -1,6 +1,5 @@
 package com.servlets;
 
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,7 +12,6 @@ import com.oauth.OAuthDao;
 import com.models.OAuthToken;
 import com.utils.ExceptionHandlerUtil;
 
-@WebServlet("/profile/*")
 public class UserProfileController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -52,6 +50,9 @@ public class UserProfileController extends HttpServlet {
             switch (action) {
                 case "updateSyncInterval":
                     UserProfileHandler.handleUpdateSyncInterval(request, response);
+                    break;
+                case "updateProfile":
+                	UserProfileHandler.handleUpdateProfile(request, response);
                     break;
                 default:
                     ExceptionHandlerUtil.logAndForwardClientException(request, response, "Invalid action.", null, "/error.jsp", UserProfileController.class);

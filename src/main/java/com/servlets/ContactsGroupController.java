@@ -11,12 +11,10 @@ import com.utils.ContactsUtil;
 import com.utils.ExceptionHandlerUtil;
 import com.utils.PathParamUtil;
 
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/group/*")
 public class ContactsGroupController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

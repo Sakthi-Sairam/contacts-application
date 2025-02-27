@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import com.dao.SessionDao;
 import com.exceptions.DaoException;
+import com.filters.AuthFilter;
 import com.managers.SessionManager;
 import com.server.CacheInvalidator;
 import com.utils.ExceptionHandlerUtil;
@@ -15,7 +16,9 @@ public class LogoutServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-		String sessionId = (String) request.getAttribute("sessionId");
+//		String sessionId = (String) request.getAttribute("sessionId");
+		String sessionId = AuthFilter.getSessionIdFromCookies(request.getCookies());
+
 		System.out.print(sessionId);
 		SessionManager.removeSession(sessionId);
 		try {

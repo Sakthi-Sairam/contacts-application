@@ -4,13 +4,11 @@ import com.oauth.OAuthService;
 import com.utils.ExceptionHandlerUtil;
 import com.models.User;
 import com.filters.AuthFilter;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/oauth2callback")
 public class OAuth2CallbackServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

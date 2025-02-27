@@ -9,9 +9,9 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import com.exceptions.QueryExecutorException;
 
 public class DBConnection {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/DemoContacts";
-    private static final String DB_USER = "root";
-    private static final String DB_PASS = "";
+    private static final String DB_URL = ConfigUtil.get("DB_URL");
+    private static final String DB_USER = ConfigUtil.get("DB_USER");
+    private static final String DB_PASS = ConfigUtil.get("DB_PASS");
 
     private static BasicDataSource dataSource = new BasicDataSource();
 
@@ -28,7 +28,6 @@ public class DBConnection {
 			try {
 				return dataSource.getConnection();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return null;

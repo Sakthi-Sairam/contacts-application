@@ -5,12 +5,10 @@ import java.nio.charset.StandardCharsets;
 
 import com.oauth.OAuthConfig;
 import com.utils.ExceptionHandlerUtil;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/googleLogin")
 public class GoogleLoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 

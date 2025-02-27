@@ -58,6 +58,8 @@ List<Contact> groupedContacts = (List<Contact>) request.getAttribute("groupedCon
 	out.print("active");%>"
 					href="/group/favourites"> <i class="bi bi-heart"></i>
 					Favourites
+				</a> <a href="/merge-contacts"> <i class="bi bi-intersect me-2"></i><span>Merge
+						Duplicates</span>
 				</a> <a href="/categories"> <i class="bi bi-tags"></i> Categories
 				</a> <a href="/logout" class="logout"> <i
 					class="bi bi-box-arrow-right"></i> Logout

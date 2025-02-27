@@ -48,6 +48,7 @@
 				</a> <a href="/profile"> <i class="bi bi-person-circle"></i> <span>Profile</span>
 				</a> <a href="/group/archived"> <i class="bi bi-archive"></i> <span>Archived</span>
 				</a> <a href="/group/favourites"> <i class="bi bi-heart"></i> <span>Favourites</span>
+				</a> <a href="/merge-contacts"> <i class="bi bi-intersect me-2"></i><span>Merge Duplicates</span>
 				</a> <a href="/categories"> <i class="bi bi-tags"></i> <span>Categories</span>
 				</a> <a href="logout" class="logout"> <i
 					class="bi bi-box-arrow-right"></i> <span>Logout</span>

@@ -9,6 +9,7 @@ import com.queryLayer.Pair;
 import com.queryLayer.QueryBuilder;
 import com.queryLayer.QueryExecutor;
 import com.queryLayer.databaseSchemaEnums.MailMapperColumn;
+import com.queryLayer.databaseSchemaEnums.MyContactsDataColumn;
 import com.queryLayer.databaseSchemaEnums.Table;
 import com.queryLayer.databaseSchemaEnums.UserDataColumn;
 
@@ -260,6 +261,26 @@ public class UserDao {
 			throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to delete PhoneNumber" + e.getMessage(),e);
 		}
 		return rowCount > 0;
+	}
+
+	public static boolean updateProfile(String firstName, String lastName, String age, String address, int userId) throws DaoException {
+		QueryBuilder qb = new QueryBuilder();
+		QueryExecutor executor = new QueryExecutor();
+		long currentTime = System.currentTimeMillis();
+
+		try {
+			qb.update(Table.USER_DATA)
+					.set(UserDataColumn.FIRST_NAME, firstName)
+					.set(UserDataColumn.LAST_NAME, lastName)
+					.set(UserDataColumn.AGE, age)
+					.set(UserDataColumn.ADDRESS, address)
+					.set(UserDataColumn.MODIFIED_AT, currentTime)
+					.where(UserDataColumn.USER_ID, "=", userId);
+
+			return executor.executeUpdate(qb) > 0;
+		} catch (QueryExecutorException e) {
+			throw new DaoException(ErrorCode.QUERY_EXECUTION_FAILED, "Failed to update contact: " + e.getMessage(), e);
+		}
 	}
 
 
